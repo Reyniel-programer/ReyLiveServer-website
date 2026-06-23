@@ -414,7 +414,7 @@
     await setDoc(doc(window.db, "users", u.username), u);
     doc(window.db, "users", username),
      u
-    };
+  };
     
     if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return}
     if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return}
@@ -423,7 +423,7 @@
     users.push(u); await saveUsers(users);
     showAuthStatus('✅ Account created! Redirecting...', true);
     setTimeout(()=>{switchTab(0);document.getElementById('l-user').value=u.username;}, 1000);
-  }
+  
 
   async function doLogin() {
     const un = document.getElementById('l-user').value.trim();
