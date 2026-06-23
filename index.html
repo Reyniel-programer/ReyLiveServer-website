@@ -410,7 +410,12 @@
       address: document.getElementById('s-addr').value.trim(),
       bio: document.getElementById('s-bio').value.trim(),
       about: '', avatarUrl: '', coverUrl: ''
-    };
+      await setDoc(
+      doc(window.db, "users", username),
+      u
+    
+    };  
+    
     if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return}
     if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return}
     let users = await getUsers();;
