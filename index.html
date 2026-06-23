@@ -332,19 +332,6 @@
   
   <script>
   
-  async function getUsers() {
-     const snapshot = await getDocs(collection(window.db, "users"));
-     return snapshot.docs.map(doc => doc.data());
-  }
-
-  async function saveUsers(users) {
-    for (const user of users) {
-      await setDoc(
-        doc(window.db, "users", user.username),
-        user
-      );
-    }    
-  }
 
   function saveMe(user) {
      localStorage.setItem(
@@ -398,7 +385,8 @@
   }
 
   async function doSignup(){
-    const u = {
+     try {
+     const u = {
       username: document.getElementById('s-user').value.trim(),
       name: document.getElementById('s-name').value.trim(),
       email: document.getElementById('s-email').value.trim(),
@@ -424,26 +412,30 @@
        showAuthStatus('Password must be at least 6 characters.', false);
         return;
       }
-      // Save user
-      await setDoc(userRef, u);
-      showAuthStatus('✅ Account created! Redirecting...', true);
-      setTimeout(() => {
-        switchTab(0);
-        document.getElementById('l-user').value = u.username;
+      
+       const userRef = doc(window.db, "users", u.username);
+       await setDoc(userRef, u);
+
+       showAuthStatus('✅ Account created! Redirecting...', true);
+       
+       setTimeout(() => {
+       switchTab(0);
+       document.getElementById('l-user').value = u.username;
       }, 1000);
-    
-    } catch (error) {
+      
+    } catch (error) {  
       console.error(error);
       showAuthStatus('❌ Signup failed.', false);
-  } 
-  
- 
+    }  
+  }
+
    async function doLogin() {
      const un = document.getElementById('l-user').value.trim();
      const pw = document.getElementById('l-pass').value.trim();
 
      try {
       const userRef = doc(window.db, "users", un);
+      await setDoc(userRef, u);
        const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
@@ -451,7 +443,8 @@
           return;
         }
 
-         saveMe(u);
+         const userData = userSnap.data();
+         saveMe(userData);
          showAuthStatus('✅ Welcome back!', true);
          setTimeout(() => loadProfile(u), 600);
 
@@ -625,16 +618,8 @@
     showProfStatus('🗑 All personal information erased.', false);
   }
 
-  async function persistUser(u){
-    let users = await getUsers();
-    const i = users.findIndex(x => x.username === u.username);
-    if(i !== -1){
-      users[i] = u;
-      await saveUsers(users);
-    }
+  
     
-    saveMe(u);
-  }
 
   function doLogout(){
     sr('me'); cu = null; avatarDataUrl = null; coverDataUrl = null;
