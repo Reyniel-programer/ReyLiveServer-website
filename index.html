@@ -67,8 +67,8 @@
         <p style="color:#71717a;font-size:13px;margin-top:6px;">Login or create your personal profile</p>
       </div>
       <div style="display:flex;border-bottom:1px solid #27272a;">
-        <button onclick="switchTab(0)" id="doLogin" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;">Login</button>
-        <button onclick="switchTab(1)" id="doSignup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;">Sign Up</button>
+        <button onclick="switchTab(0)" id="tab-login"  class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;">Login</button>
+        <button onclick="switchTab(1)" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;">Sign Up</button>
       </div>
       <div style="padding:28px;">
 
@@ -307,7 +307,8 @@
 
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, getDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
 
 
   const firebaseConfig = {
@@ -324,6 +325,7 @@
   window.db = getFirestore(app)
   window.collection = collection;
   window.getDocs = getDocs;
+  window.getDoc = getDoc;
   window.setDoc = setDoc;
   window.doc = doc;
   
@@ -414,7 +416,15 @@
       }
       
        const userRef = doc(window.db, "users", u.username);
-       await setDoc(userRef, u);
+       const userSnap = await getDoc(userRef);
+
+       if (userSnap.exists()) {
+       showAuthStatus('❌ Username already exists.', false);
+       return;
+      }
+
+      await setDoc(userRef, u);
+
 
        showAuthStatus('✅ Account created! Redirecting...', true);
        
@@ -444,9 +454,6 @@
       const userRef = doc(window.db, "users", un);
       const userSnap = await getDoc(userRef);
 
-      await setDoc(userRef, u);
-      const userSnap = await getDoc(userRef);
-
       if (!userSnap.exists()) {
         showAuthStatus('❌ Invalid username or password.', false);
         return;
@@ -462,7 +469,7 @@
 
       saveMe(userData);
       showAuthStatus('✅ Welcome back!', true);
-      setTimeout(() => loadProfile(u), 600);
+      setTimeout(() => loadProfile(userData), 500);
 
       setTimeout(() => loadProfile(userData), 500);
 
@@ -647,18 +654,30 @@
     document.getElementById('l-user').value = '';
     document.getElementById('l-pass').value = '';
   }
+   
+  async function persistUser(user) {
+  try {
+    await setDoc(
+      doc(window.db, "users", user.username),
+      user
+    );
 
-  window.onload = function(){
-    const d = sg('me');
-    if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
-  };
-  
+     saveMe(user);
+   } catch (err) {
+     console.error(err);
+    }
+  }
+
+
+
+
+
  </script>
 
   
  <script>
-   function doLogout(){
-  }
+   
+  
   window.onload = function(){
    const d = sg('me');
    if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
@@ -680,6 +699,11 @@
   window.removeCover = removeCover;
   window.eraseAll = eraseAll;
   
+  </script>
+
+  <script>
+  window.switchTab = switchTab;
+
   </script>
 
   </body>
