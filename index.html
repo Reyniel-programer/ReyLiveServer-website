@@ -433,26 +433,45 @@
      const un = document.getElementById('l-user').value.trim();
      const pw = document.getElementById('l-pass').value.trim();
 
-     try {
-      const userRef = doc(window.db, "users", un);
-      await setDoc(userRef, u);
-       const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-          showAuthStatus('❌ Invalid username or password.', false);
-          return;
-        }
-
-         const userData = userSnap.data();
-         saveMe(userData);
-         showAuthStatus('✅ Welcome back!', true);
-         setTimeout(() => loadProfile(u), 600);
-
-       } catch (error) {
-        console.error(error);
-        showAuthStatus('❌ Login failed.', false);
-      }
+     if (!un || !pw) {
+      showAuthStatus('Please enter username and password.', false);
+      return;
     }
+
+
+    try {
+
+      const userRef = doc(window.db, "users", un);
+      const userSnap = await getDoc(userRef);
+
+      await setDoc(userRef, u);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        showAuthStatus('❌ Invalid username or password.', false);
+        return;
+      }
+
+      const userData = userSnap.data();
+
+      if (userData.password !== pw) {
+        showAuthStatus('❌ Wrong password.', false);
+        return;
+      }
+
+
+      saveMe(userData);
+      showAuthStatus('✅ Welcome back!', true);
+      setTimeout(() => loadProfile(u), 600);
+
+      setTimeout(() => loadProfile(userData), 500);
+
+
+    } catch (error) {
+      console.error(error);
+      showAuthStatus('❌ Login failed.', false);
+    }
+  }
 
 
 
@@ -633,6 +652,35 @@
     const d = sg('me');
     if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
   };
-</script>
-</body>
-</html>
+  
+ </script>
+
+  
+ <script>
+   function doLogout(){
+  }
+  window.onload = function(){
+   const d = sg('me');
+   if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
+  };
+  // 👇 ADD THIS HERE (VERY IMPORTANT
+  window.switchTab = switchTab;
+  window.togglePw = togglePw;
+  window.doSignup = doSignup;
+  window.doLogin = doLogin;
+  window.openEdit = openEdit;
+  window.closeEdit = closeEdit;
+  window.saveEdit = saveEdit;
+  window.doLogout = doLogout;
+  window.changeAvatar = changeAvatar;
+  window.changeCover = changeCover;
+  window.changeAvatarFromModal = changeAvatarFromModal;
+  window.changeCoverFromModal = changeCoverFromModal;
+  window.removeAvatar = removeAvatar;
+  window.removeCover = removeCover;
+  window.eraseAll = eraseAll;
+  
+  </script>
+
+  </body>
+  </html>
