@@ -90,7 +90,7 @@
             <div><label>Username</label><input id="s-user" placeholder="Choose username"/></div>
             <div><label>Full Name</label><input id="s-name" placeholder="Your name"/></div>
             <div><label>Email</label><input id="s-email" type="email" placeholder="you@email.com"/></div>
-            <div><label>Phone</label><input id="s-phone" type="tel" placeholder="+63 912 345 6789"/></div>
+            <div><label>Phone</label><input id="s-phone" type="tel" placeholder="+63 9XX XXX XXX"/></div>
             <div><label>Password</label>
               <div class="rel-pw"><input id="s-pass" type="password" placeholder="Min 6 chars"/><button class="pw-eye" onclick="togglePw('s-pass','s-eye')" id="s-eye">👁</button></div>
             </div>
@@ -302,23 +302,24 @@
     </div>
   </div>
 
-</div>
+ </div>
 
 
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
   import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
+
   const firebaseConfig = {
-   apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
+    apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
     authDomain: "reyliveserver-73cba.firebaseapp.com",
     projectId: "reyliveserver-73cba",
     storageBucket: "reyliveserver-73cba.firebasestorage.app",
     messagingSenderId: "220200732080",
     appId: "1:220200732080:web:463bceaa7189f7ad3b4275",
     measurementId: "G-C2VZQGRDB4"
-
   };
+
   const app = initializeApp(firebaseConfig);
   window.db = getFirestore(app)
   window.collection = collection;
@@ -327,8 +328,44 @@
   window.doc = doc;
   
   </script>
-   
+  
+  
   <script>
+  
+  async function getUsers() {
+     const snapshot = await getDocs(collection(window.db, "users"));
+     return snapshot.docs.map(doc => doc.data());
+  }
+
+  async function saveUsers(users) {
+    for (const user of users) {
+      await setDoc(
+        doc(window.db, "users", user.username),
+        user
+      );
+    }    
+  }
+
+  function saveMe(user) {
+     localStorage.setItem(
+      "me",
+      JSON.stringify(user)
+    );
+  }
+
+  function sg(key) {
+    return localStorage.getItem(key);
+  }
+
+  function ss(key, value) {
+    localStorage.setItem(key, value);
+  }
+  
+  function sr(key) {
+  localStorage.removeItem(key);
+  }  
+
+  let cu = null, avatarDataUrl = null, coverDataUrl = null;
 
   function switchTab(t){
     document.getElementById('login-form').classList.toggle('hidden', t!==0);
@@ -362,38 +399,37 @@
 
   async function doSignup(){
     const u = {
-      username: document.getElementById('s-user').value.trim(),
-      name: document.getElementById('s-name').value.trim(),
-      email: document.getElementById('s-email').value.trim(),
-      phone: document.getElementById('s-phone').value.trim(),
-      password: document.getElementById('s-pass').value.trim(),
-      age: document.getElementById('s-age').value.trim(),
-      gender: document.getElementById('s-gender').value,
-      birthday: document.getElementById('s-bday').value,
-      address: document.getElementById('s-addr').value.trim(),
-      bio: document.getElementById('s-bio').value.trim(),
-      about: '', avatarUrl: '', coverUrl: ''
+    username: document.getElementById('s-user').value.trim(),
+    name: document.getElementById('s-name').value.trim(),
+    email: document.getElementById('s-email').value.trim(),
+    phone: document.getElementById('s-phone').value.trim(),
+    password: document.getElementById('s-pass').value.trim(),
+    age: document.getElementById('s-age').value.trim(),
+    gender: document.getElementById('s-gender').value,
+    birthday: document.getElementById('s-bday').value,
+    address: document.getElementById('s-addr').value.trim(),
+    bio: document.getElementById('s-bio').value.trim(),
+    about: '', avatarUrl: '', coverUrl: ''
     };
-    if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return;}
-    if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return;}
-    let users = getUsers();
-    if(users.find(x=>x.username===u.username)){showAuthStatus('Username already taken.',false);return;}
-    users.push(u);
-    saveUsers(users);
-    try{
-      await window.setDoc(window.doc(window.db, "users", u.username), u);
-    } catch(e) {
-      showAuthStatus('❌ Failed to save to database: ' + e.message, false);
-      return;
-    }
+    await setDoc(doc(window.db, "users", u.username), u);
+    doc(window.db, "users", username),
+     u
+    };
+    
+    if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return}
+    if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return}
+    let users = await getUsers();;
+    if(users.find(x=>x.username===u.username)){showAuthStatus('Username already taken.',false);return}
+    users.push(u); await saveUsers(users);
     showAuthStatus('✅ Account created! Redirecting...', true);
-    setTimeout(()=>{ switchTab(0); document.getElementById('l-user').value=u.username; }, 1000);
+    setTimeout(()=>{switchTab(0);document.getElementById('l-user').value=u.username;}, 1000);
   }
 
-  function doLogin(){
+  async function doLogin() {
     const un = document.getElementById('l-user').value.trim();
     const pw = document.getElementById('l-pass').value.trim();
-    const u = getUsers().find(x=>x.username===un&&x.password===pw);
+    const users = await getUsers();
+    const u = users.find(x => x.username === un && x.password === pw);    
     if(!u){showAuthStatus('❌ Invalid username or password.',false);return}
     saveMe(u);
     showAuthStatus('✅ Welcome back!', true);
@@ -562,10 +598,14 @@
     showProfStatus('🗑 All personal information erased.', false);
   }
 
-  function persistUser(u){
-    let users = getUsers();
+  async function persistUser(u){
+    let users = await getUsers();
     const i = users.findIndex(x => x.username === u.username);
-    if(i !== -1){ users[i] = u; saveUsers(users); }
+    if(i !== -1){
+      users[i] = u;
+      await saveUsers(users);
+    }
+    
     saveMe(u);
   }
 
