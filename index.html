@@ -397,33 +397,61 @@
     setTimeout(() => el.innerHTML = '', 3000);
   }
 
-  async function doSignup(){
+  async function doSignup() {
+    // 1. Gather form values
     const u = {
-    username: document.getElementById('s-user').value.trim(),
-    name: document.getElementById('s-name').value.trim(),
-    email: document.getElementById('s-email').value.trim(),
-    phone: document.getElementById('s-phone').value.trim(),
-    password: document.getElementById('s-pass').value.trim(),
-    age: document.getElementById('s-age').value.trim(),
-    gender: document.getElementById('s-gender').value,
-    birthday: document.getElementById('s-bday').value,
-    address: document.getElementById('s-addr').value.trim(),
-    bio: document.getElementById('s-bio').value.trim(),
-    about: '', avatarUrl: '', coverUrl: ''
-    };
-    await setDoc(doc(window.db, "users", u.username), u);
-    doc(window.db, "users", username),
-     u
-  };
-    
-    if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return}
-    if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return}
-    let users = await getUsers();;
-    if(users.find(x=>x.username===u.username)){showAuthStatus('Username already taken.',false);return}
-    users.push(u); await saveUsers(users);
-    showAuthStatus('✅ Account created! Redirecting...', true);
-    setTimeout(()=>{switchTab(0);document.getElementById('l-user').value=u.username;}, 1000);
-  
+      username: document.getElementById('s-user').value.trim(),
+      name: document.getElementById('s-name').value.trim(),
+      email: document.getElementById('s-email').value.trim(),
+      phone: document.getElementById('s-phone').value.trim()
+      password: document.getElementById('s-pass').value.trim(),
+      age: document.getElementById('s-age').value.trim(),
+      gender: document.getElementById('s-gender').value,
+      birthday: document.getElementById('s-bday').value,
+      address: document.getElementById('s-addr').value.trim(),
+      bio: document.getElementById('s-bio').value.trim(),
+      about: '',
+      avatarUrl: '',
+      coverUrl: ''
+   };
+
+    // 2. Validate inputs FIRST (Before saving anything to the database)
+    if (!u.username || !u.name || !u.email || !u.password || !u.age || !u.gender || !u.birthday || !u.address) {
+        showAuthStatus('Fill in all required fields.', false);
+        return;
+    }
+    if (u.password.length < 6) {
+        showAuthStatus('Password must be at least 6 characters.', false);
+        return;
+    }
+
+    try {
+        
+        let users = await getUsers(); 
+        if (users.find(x => x.username === u.username)) {
+            showAuthStatus('Username already taken.', false);
+            return;
+        }
+
+        // 4. Save to Firestore database
+        await setDoc(doc(window.db, "users", u.username), u);
+
+        // 5. Save locally (if your app uses both Firestore and a local saveUsers function)
+        users.push(u); 
+        await saveUsers(users);
+
+        // 6. Success handling
+        showAuthStatus('✅ Account created! Redirecting...', true);
+        setTimeout(() => {
+            switchTab(0);
+            document.getElementById('l-user').value = u.username;
+        }, 1000);
+
+    } catch (error) {
+        console.error("Signup error: ", error);
+        showAuthStatus('Something went wrong. Please try again.', false);
+    }
+  }
 
   async function doLogin() {
     const un = document.getElementById('l-user').value.trim();
