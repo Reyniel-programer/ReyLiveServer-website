@@ -304,16 +304,31 @@
 
 </div>
 
-<script>
-  let useMemory = false, mem = {};
-  function sg(k){if(useMemory)return mem[k]!==undefined?JSON.stringify(mem[k]):null;try{return localStorage.getItem(k)}catch(e){useMemory=true;return null}}
-  function ss(k,v){if(useMemory){try{mem[k]=JSON.parse(v)}catch{mem[k]=v}return}try{localStorage.setItem(k,v)}catch(e){useMemory=true;try{mem[k]=JSON.parse(v)}catch{mem[k]=v}}}
-  function sr(k){if(useMemory){delete mem[k];return}try{localStorage.removeItem(k)}catch(e){delete mem[k]}}
-  function getUsers(){const d=sg('users');return d?JSON.parse(d):[]}
-  function saveUsers(u){ss('users',JSON.stringify(u))}
-  function saveMe(u){ss('me',JSON.stringify(u))}
 
-  let cu = null, avatarDataUrl = null, coverDataUrl = null;
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+   apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
+    authDomain: "reyliveserver-73cba.firebaseapp.com",
+    projectId: "reyliveserver-73cba",
+    storageBucket: "reyliveserver-73cba.firebasestorage.app",
+    messagingSenderId: "220200732080",
+    appId: "1:220200732080:web:463bceaa7189f7ad3b4275",
+    measurementId: "G-C2VZQGRDB4"
+
+  };
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app)
+  window.collection = collection;
+  window.getDocs = getDocs;
+  window.setDoc = setDoc;
+  window.doc = doc;
+  
+  </script>
+   
+  <script>
 
   function switchTab(t){
     document.getElementById('login-form').classList.toggle('hidden', t!==0);
@@ -345,7 +360,7 @@
     setTimeout(() => el.innerHTML = '', 3000);
   }
 
-  async function doSignup(){
+  function doSignup(){
     const u = {
       username: document.getElementById('s-user').value.trim(),
       name: document.getElementById('s-name').value.trim(),
@@ -365,7 +380,6 @@
     if(users.find(x=>x.username===u.username)){showAuthStatus('Username already taken.',false);return;}
     users.push(u);
     saveUsers(users);
-    await setDoc(doc(window.db, "users", u.username), u);
     showAuthStatus('✅ Account created! Redirecting...', true);
     setTimeout(()=>{ switchTab(0); document.getElementById('l-user').value=u.username; }, 1000);
   }
