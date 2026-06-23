@@ -409,27 +409,59 @@
       birthday: document.getElementById('s-bday').value,
       address: document.getElementById('s-addr').value.trim(),
       bio: document.getElementById('s-bio').value.trim(),
-      about: '', avatarUrl: '', coverUrl: ''
-    };
-    if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return}
-    if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return}
-    let users = getUsers();
-    if(users.find(x=>x.username===u.username)){showAuthStatus('Username already taken.',false);return}
-    users.push(u); saveUsers(users);
-    showAuthStatus('✅ Account created! Redirecting...', true);
-    setTimeout(()=>{switchTab(0);document.getElementById('l-user').value=u.username;}, 1000);
-  }
+      about: '',
+      avatarUrl: '',
+      coverUrl: ''
+     };
+
+      if (!u.username || !u.name || !u.email || !u.password ||
+          !u.age || !u.gender || !u.birthday || !u.address) {
+        showAuthStatus('Fill in all required fields.', false);
+        return;
+      }
+
+      if (u.password.length < 6) {
+       showAuthStatus('Password must be at least 6 characters.', false);
+        return;
+      }
+      // Save user
+      await setDoc(userRef, u);
+      showAuthStatus('✅ Account created! Redirecting...', true);
+      setTimeout(() => {
+        switchTab(0);
+        document.getElementById('l-user').value = u.username;
+      }, 1000);
+    
+    } catch (error) {
+      console.error(error);
+      showAuthStatus('❌ Signup failed.', false);
+  } 
   
-  async function doLogin() {
-    const un = document.getElementById('l-user').value.trim();
-    const pw = document.getElementById('l-pass').value.trim();
-    const users = await getUsers();
-    const u = users.find(x => x.username === un && x.password === pw);    
-    if(!u){showAuthStatus('❌ Invalid username or password.',false);return}
-    saveMe(u);
-    showAuthStatus('✅ Welcome back!', true);
-    setTimeout(()=>loadProfile(u), 600);
-  }
+ 
+   async function doLogin() {
+     const un = document.getElementById('l-user').value.trim();
+     const pw = document.getElementById('l-pass').value.trim();
+
+     try {
+      const userRef = doc(window.db, "users", un);
+       const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          showAuthStatus('❌ Invalid username or password.', false);
+          return;
+        }
+
+         saveMe(u);
+         showAuthStatus('✅ Welcome back!', true);
+         setTimeout(() => loadProfile(u), 600);
+
+       } catch (error) {
+        console.error(error);
+        showAuthStatus('❌ Login failed.', false);
+      }
+    }
+
+
 
   function loadProfile(u){
     cu = u;
