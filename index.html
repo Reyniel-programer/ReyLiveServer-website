@@ -90,7 +90,7 @@
             <div><label>Username</label><input id="s-user" placeholder="Choose username"/></div>
             <div><label>Full Name</label><input id="s-name" placeholder="Your name"/></div>
             <div><label>Email</label><input id="s-email" type="email" placeholder="you@email.com"/></div>
-            <div><label>Phone</label><input id="s-phone" type="tel" placeholder="+63 912 345 6789"/></div>
+            <div><label>Phone</label><input id="s-phone" type="tel" placeholder="+63 9XX XXX XXX"/></div>
             <div><label>Password</label>
               <div class="rel-pw"><input id="s-pass" type="password" placeholder="Min 6 chars"/><button class="pw-eye" onclick="togglePw('s-pass','s-eye')" id="s-eye">👁</button></div>
             </div>
@@ -304,31 +304,16 @@
 
 </div>
 
+<script>
+  let useMemory = false, mem = {};
+  function sg(k){if(useMemory)return mem[k]!==undefined?JSON.stringify(mem[k]):null;try{return localStorage.getItem(k)}catch(e){useMemory=true;return null}}
+  function ss(k,v){if(useMemory){try{mem[k]=JSON.parse(v)}catch{mem[k]=v}return}try{localStorage.setItem(k,v)}catch(e){useMemory=true;try{mem[k]=JSON.parse(v)}catch{mem[k]=v}}}
+  function sr(k){if(useMemory){delete mem[k];return}try{localStorage.removeItem(k)}catch(e){delete mem[k]}}
+  function getUsers(){const d=sg('users');return d?JSON.parse(d):[]}
+  function saveUsers(u){ss('users',JSON.stringify(u))}
+  function saveMe(u){ss('me',JSON.stringify(u))}
 
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-   apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
-    authDomain: "reyliveserver-73cba.firebaseapp.com",
-    projectId: "reyliveserver-73cba",
-    storageBucket: "reyliveserver-73cba.firebasestorage.app",
-    messagingSenderId: "220200732080",
-    appId: "1:220200732080:web:463bceaa7189f7ad3b4275",
-    measurementId: "G-C2VZQGRDB4"
-
-  };
-  const app = initializeApp(firebaseConfig);
-  window.db = getFirestore(app)
-  window.collection = collection;
-  window.getDocs = getDocs;
-  window.setDoc = setDoc;
-  window.doc = doc;
-  
-  </script>
-   
-  <script>
+  let cu = null, avatarDataUrl = null, coverDataUrl = null;
 
   function switchTab(t){
     document.getElementById('login-form').classList.toggle('hidden', t!==0);
@@ -360,7 +345,7 @@
     setTimeout(() => el.innerHTML = '', 3000);
   }
 
-  async function doSignup(){
+  function doSignup(){
     const u = {
       username: document.getElementById('s-user').value.trim(),
       name: document.getElementById('s-name').value.trim(),
@@ -374,20 +359,13 @@
       bio: document.getElementById('s-bio').value.trim(),
       about: '', avatarUrl: '', coverUrl: ''
     };
-    if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return;}
-    if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return;}
+    if(!u.username||!u.name||!u.email||!u.password||!u.age||!u.gender||!u.birthday||!u.address){showAuthStatus('Fill in all required fields.',false);return}
+    if(u.password.length<6){showAuthStatus('Password must be at least 6 characters.',false);return}
     let users = getUsers();
-    if(users.find(x=>x.username===u.username)){showAuthStatus('Username already taken.',false);return;}
-    users.push(u);
-    saveUsers(users);
-    try{
-      await window.setDoc(window.doc(window.db, "users", u.username), u);
-    } catch(e) {
-      showAuthStatus('❌ Failed to save to database: ' + e.message, false);
-      return;
-    }
+    if(users.find(x=>x.username===u.username)){showAuthStatus('Username already taken.',false);return}
+    users.push(u); saveUsers(users);
     showAuthStatus('✅ Account created! Redirecting...', true);
-    setTimeout(()=>{ switchTab(0); document.getElementById('l-user').value=u.username; }, 1000);
+    setTimeout(()=>{switchTab(0);document.getElementById('l-user').value=u.username;}, 1000);
   }
 
   function doLogin(){
