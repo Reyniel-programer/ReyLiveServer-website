@@ -55,7 +55,90 @@
     
     
   </style>
-    
+   
+   <style>
+/* Videos Grid Styling */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+.video-card {
+  background: #27272a;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #3f3f46;
+  display: flex;
+  flex-direction: column;
+}
+.video-player video {
+  width: 100%;
+  height: 130px;
+  background: #000;
+  object-fit: cover;
+}
+.video-info {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.video-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  word-break: break-word;
+}
+.video-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+</style?
+ 
+ <head>
+ /* Videos Grid Styling */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+.video-card {
+  background: #27272a;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #3f3f46;
+  display: flex;
+  flex-direction: column;
+}
+.video-player video {
+  width: 100%;
+  height: 130px;
+  background: #000;
+  object-fit: cover;
+}
+.video-info {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.video-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  word-break: break-word;
+}
+.video-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+</style>
   <style>
     /* Videos Grid Layout */
     .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 10px; }
@@ -786,7 +869,126 @@ function renameVideo(index) {
    const d = sg('me');
    if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
   };
-  // 👇 ADD THIS HERE (VERY IMPORTANT
+  
+  function renderProfile(){
+    const u = cu;
+    document.getElementById('p-name').textContent = u.name || '—';
+    document.getElementById('p-username-tag').textContent = '@' + (u.username || '');
+    document.getElementById('p-bio').textContent = u.bio || 'No bio added';
+    document.getElementById('p-about').textContent = u.about || 'Welcome to my profile.';
+    document.getElementById('p-fullname').textContent = u.name || '—';
+    document.getElementById('p-age').textContent = u.age || '—';
+    document.getElementById('p-gender').textContent = u.gender || '—';
+    document.getElementById('p-bday').textContent = u.birthday || '—';
+    document.getElementById('p-email').textContent = u.email || '—';
+    document.getElementById('p-phone').textContent = u.phone || '—';
+    document.getElementById('p-addr').textContent = u.address || '—';
+    document.getElementById('p-ubox').textContent = u.username || '—';
+    document.getElementById('p-nbox').textContent = u.name || '—';
+    document.getElementById('p-ebox').textContent = u.email || '—';
+    document.getElementById('p-phbox').textContent = u.phone || '—';
+    document.getElementById('p-agebox').textContent = u.age || '—';
+    document.getElementById('p-genbox').textContent = u.gender || '—';
+    document.getElementById('p-bdbox').textContent = u.birthday || '—';
+    document.getElementById('p-adbox').textContent = u.address || '—';
+    
+    const letter = u.name ? u.name.charAt(0).toUpperCase() : 'U';
+    document.getElementById('avatar-letter').textContent = letter;
+
+    if(avatarDataUrl){
+      document.getElementById('avatar-img').src = avatarDataUrl;
+      document.getElementById('avatar-img').style.display = 'block';
+      document.getElementById('avatar-letter').style.display = 'none';
+    } else {
+      document.getElementById('avatar-img').style.display = 'none';
+      document.getElementById('avatar-letter').style.display = 'block';
+    }
+
+    if(coverDataUrl){
+      document.getElementById('cover-bg').style.cssText = `width:100%;height:100%;background-image:url(${coverDataUrl});background-size:cover;background-position:center;`;
+    } else {
+      document.getElementById('cover-bg').style.cssText = 'width:100%;height:100%;background:linear-gradient(135deg,#1d4ed8,#38bdf8);';
+    }
+
+    // Automatically draw saved videos upon login
+    renderVideos();
+  }
+
+  // --- Dynamic Video Handlers ---
+  function renderVideos() {
+    const container = document.getElementById('video-grid');
+    const noVideos = document.getElementById('no-videos');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const videos = cu.videos || [];
+    
+    if (videos.length === 0) {
+      if(noVideos) noVideos.style.display = 'block';
+      return;
+    }
+
+    if(noVideos) noVideos.style.display = 'none';
+
+    videos.forEach((video, index) => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <div class="video-player">
+          <video src="${video.url}" controls></video>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${video.title || 'Untitled Video'}</div>
+          <div class="video-actions">
+            <button onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
+          </div>
+        </div>
+      `;
+       container.appendChild(card);
+    });
+  }
+
+  function addVideo(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 12 * 1024 * 1024) {
+      alert("Video is too large! Please keep it under 12MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const videoData = {
+        url: ev.target.result,
+        title: file.name,
+        addedAt: new Date().toISOString()
+      };
+      
+      if (!cu.videos) cu.videos = [];
+      cu.videos.push(videoData);
+   
+      persistUser(cu);
+      renderVideos();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function deleteVideo(index) {
+    if (!confirm('Delete this video?')) return;
+    cu.videos.splice(index, 1);
+    persistUser(cu);
+    renderVideos();
+  }
+</script>
+
+<script>
+  window.onload = function(){
+    const d = sg('me');
+    if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
+  };
+
+  // Exposing layouts cleanly to window scope
   window.switchTab = switchTab;
   window.togglePw = togglePw;
   window.doSignup = doSignup;
@@ -798,20 +1000,16 @@ function renameVideo(index) {
   window.changeAvatar = changeAvatar;
   window.changeCover = changeCover;
   window.changeAvatarFromModal = changeAvatarFromModal;
-  window.changeCoverFromModal = changeCoverFromModal;
-  window.removeAvatar = removeAvatar;
-  window.removeCover = removeCover;
-  window.eraseAll = eraseAll;
+  window.deleteAccount = deleteAccount;
   
-  </script>
+  // Exposing Video Elements
+  window.addVideo = addVideo;
+  window.deleteVideo = deleteVideo;
+  window.renderVideos = renderVideos;
+</script>
+</body>
+</html>
 
-  <script>
-  window.switchTab = switchTab;
-
-  </script>
-
-  </body>
-  </html>
 8:32 PM
 <!DOCTYPE html>
 <html lang="en">
@@ -1555,14 +1753,106 @@ function renameVideo(index) {
      console.error(err);
     }
   }
-
-
-
-
-
- </script>
-
   
+  // --- Core Video Functions ---
+  function renderVideos() {
+    const container = document.getElementById('video-grid');
+    const noVideos = document.getElementById('no-videos');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const videos = cu.videos || [];
+    
+    if (videos.length === 0) {
+      if(noVideos) noVideos.style.display = 'block';
+      return;
+    }
+    
+    if(noVideos) noVideos.style.display = 'none';
+
+    videos.forEach((video, index) => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <div class="video-player">
+          <video src="${video.url}" controls></video>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${video.title || 'Untitled Video'}</div>
+          <div class="video-actions">
+            <button onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function addVideo(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 12 * 1024 * 1024) {
+      alert("Video is too large! Please keep it under 12MB for database storage.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const videoData = {
+        url: ev.target.result,
+        title: file.name,
+        addedAt: new Date().toISOString()
+      };
+      
+      if (!cu.videos) cu.videos = [];
+      cu.videos.push(videoData);
+      
+      persistUser(cu);
+      renderVideos();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function deleteVideo(index) {
+    if (!confirm('Delete this video?')) return;
+    cu.videos.splice(index, 1);
+    persistUser(cu);
+    renderVideos();
+  }
+</script>
+
+<script>
+  window.onload = function(){
+    const d = sg('me');
+    if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
+  };
+
+  // Exposing layouts cleanly to window scope
+  window.switchTab = switchTab;
+  window.togglePw = togglePw;
+  window.doSignup = doSignup;
+  window.doLogin = doLogin;
+  window.openEdit = openEdit;
+  window.closeEdit = closeEdit;
+  window.saveEdit = saveEdit;
+  window.doLogout = doLogout;
+  window.changeAvatar = changeAvatar;
+  window.changeCover = changeCover;
+  window.changeAvatarFromModal = changeAvatarFromModal;
+  window.deleteAccount = deleteAccount;
+  
+  // Exposing Video Elements globally
+  window.addVideo = addVideo;
+  window.deleteVideo = deleteVideo;
+  window.renderVideos = renderVideos;
+ 
+  </script>
+  
+  </body>
+  
+  </html>
+
  <script>
    
   
@@ -1587,6 +1877,7 @@ function renameVideo(index) {
   window.removeCover = removeCover;
   window.eraseAll = eraseAll;
   window.addVideo = addVideo;
+  window.renameVideo = renameVideo;
   window.deleteVideo = deleteVideo;
   window.renderVideos = renderVideos;
   </script>
