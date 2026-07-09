@@ -48,15 +48,6 @@
       border-color: #f59e0b;
     }
 
-    input:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    select option {
-      background: #18181b;
-    }
-
     label {
       display: block;
       font-size: 13px;
@@ -139,12 +130,19 @@
       border: 1px solid #3f3f46;
     }
 
-    .modal-head {
+    .modal-head,
+    .modal-foot {
       padding: 20px 24px;
       border-bottom: 1px solid #27272a;
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+
+    .modal-foot {
+      border-top: 1px solid #27272a;
+      border-bottom: none;
+      gap: 10px;
     }
 
     .modal-body {
@@ -154,13 +152,6 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-    }
-
-    .modal-foot {
-      padding: 16px 24px;
-      border-top: 1px solid #27272a;
-      display: flex;
-      gap: 10px;
     }
 
     .grid2 {
@@ -183,56 +174,6 @@
       cursor: pointer;
       color: #71717a;
       font-size: 14px;
-    }
-
-    .pw-eye:hover {
-      color: #f59e0b;
-    }
-
-    .cover-wrap,
-    .upload-circle {
-      position: relative;
-      cursor: pointer;
-    }
-
-    .cover-wrap:hover .cover-overlay,
-    .upload-circle:hover .upload-overlay {
-      opacity: 1;
-    }
-
-    .cover-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      font-size: 13px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .upload-overlay {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.2s;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .upload-overlay span {
-      font-size: 10px;
-      color: #fff;
-      font-weight: 600;
     }
 
     .video-grid {
@@ -265,20 +206,6 @@
       flex-grow: 1;
     }
 
-    .video-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      word-break: break-word;
-    }
-
-    .video-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-      flex-wrap: wrap;
-    }
-
     .section-box {
       background: #18181b;
       border-radius: 18px;
@@ -308,24 +235,16 @@
     <div id="auth-wrap" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f172a,#18181b)">
       <div style="width:100%;max-width:480px;background:#18181b;border-radius:24px;border:1px solid #f59e0b33;overflow:hidden;">
         <div style="padding:32px 32px 24px;text-align:center;border-bottom:1px solid #27272a;">
-          <div style="width:52px;height:52px;background:#f59e0b;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-            <svg width="24" height="24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-              <path d="M22 11l-3 3-1.5-1.5"/>
-            </svg>
-          </div>
           <h1 style="font-size:24px;color:#f59e0b;font-weight:700;">AuthHub</h1>
           <p style="color:#71717a;font-size:13px;margin-top:6px;">Login or create your personal profile</p>
         </div>
 
         <div style="display:flex;border-bottom:1px solid #27272a;">
-          <button onclick="switchTab(0)" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;">Login</button>
-          <button onclick="switchTab(1)" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;">Sign Up</button>
+          <button onclick="switchTab(0)" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;">Login</button>
+          <button onclick="switchTab(1)" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;">Sign Up</button>
         </div>
 
         <div style="padding:28px;">
-          <!-- LOGIN -->
           <div id="login-form">
             <div style="display:flex;flex-direction:column;gap:14px;">
               <div>
@@ -341,9 +260,7 @@
                 </div>
               </div>
 
-              <button class="btn btn-orange" style="width:100%;justify-content:center;margin-top:4px;" onclick="doLogin()">
-                Sign In
-              </button>
+              <button class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doLogin()">Sign In</button>
             </div>
 
             <p style="text-align:center;margin-top:16px;font-size:13px;color:#71717a;">
@@ -352,7 +269,6 @@
             </p>
           </div>
 
-          <!-- SIGNUP -->
           <div id="signup-form" class="hidden">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div><label>Username</label><input id="s-user" placeholder="Choose username" /></div>
@@ -399,281 +315,139 @@
 
     <!-- PROFILE -->
     <div id="profile-wrap" class="hidden" style="background:#09090b;min-height:100vh;">
-      <div class="cover-wrap" onclick="document.getElementById('cover-input').click()" style="height:220px;overflow:hidden;position:relative;">
+      <div style="height:220px;overflow:hidden;position:relative;">
         <div id="cover-bg" style="width:100%;height:100%;background:linear-gradient(135deg,#1d4ed8,#38bdf8);background-size:cover;background-position:center;"></div>
-        <div class="cover-overlay">Change Cover Photo</div>
       </div>
 
-      <input type="file" id="cover-input" accept="image/*" class="hidden" onchange="changeCover(event)" />
-
-      <div style="background:#18181b;padding:0 24px 20px;border-bottom:1px solid #27272a;">
-        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:8px;">
-          <div style="display:flex;align-items:flex-end;gap:14px;">
-            <div class="upload-circle" style="margin-top:-54px;" onclick="document.getElementById('avatar-input').click()">
-              <div id="avatar-circle" style="width:110px;height:110px;border-radius:50%;border:4px solid #09090b;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:#000;overflow:hidden;">
-                <span id="avatar-letter">U</span>
-                <img id="avatar-img" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;" src="" alt="avatar" />
-              </div>
-              <div class="upload-overlay" style="width:110px;height:110px;top:0;">
-                <span>Change</span>
-              </div>
-            </div>
-
-            <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="changeAvatar(event)" />
-
-            <div>
-              <h2 id="p-name" style="font-size:22px;font-weight:700;color:#fff;"></h2>
-              <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-orange" onclick="openEdit()">✏️ Edit Profile</button>
-            <button class="btn btn-red" onclick="doLogout()">⬅ Logout</button>
-          </div>
-        </div>
+      <div style="background:#18181b;padding:24px;border-bottom:1px solid #27272a;">
+        <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
+        <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
       </div>
 
       <div class="profile-body" style="max-width:900px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:280px 1fr;gap:20px;">
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <div class="section-box">
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Intro</h3>
-            <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-              <p><span style="color:#f59e0b;font-weight:600;">Full Name:</span> <span id="p-fullname" style="color:#d4d4d8;"></span></p>
-              <p><span style="color:#f59e0b;font-weight:600;">Age:</span> <span id="p-age" style="color:#d4d4d8;"></span></p>
-              <p><span style="color:#f59e0b;font-weight:600;">Gender:</span> <span id="p-gender" style="color:#d4d4d8;"></span></p>
-              <p><span style="color:#f59e0b;font-weight:600;">Birthday:</span> <span id="p-bday" style="color:#d4d4d8;"></span></p>
-            </div>
-          </div>
-
-          <div class="section-box">
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Contact Info</h3>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-              <p><span style="color:#f59e0b;font-weight:600;">Email:</span> <span id="p-email" style="color:#d4d4d8;"></span></p>
-              <p><span style="color:#f59e0b;font-weight:600;">Phone:</span> <span id="p-phone" style="color:#d4d4d8;">—</span></p>
-              <p><span style="color:#f59e0b;font-weight:600;">Address:</span> <span id="p-addr" style="color:#d4d4d8;"></span></p>
-            </div>
-          </div>
+        <div class="section-box">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Intro</h3>
+          <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <div class="section-box">
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:10px;">About</h3>
-            <p id="p-about" style="color:#a1a1aa;font-size:14px;line-height:1.6;">Welcome to my profile.</p>
+        <div class="section-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;">
+            <h3 style="font-size:16px;font-weight:700;">My Videos</h3>
+            <button class="btn btn-orange" onclick="document.getElementById('video-upload-input').click()" style="padding:8px 16px;font-size:13px;">
+              + Add Video
+            </button>
+            <input type="file" id="video-upload-input" accept="video/*" class="hidden" onchange="addVideo(event)" />
           </div>
 
-          <div class="section-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;">
-              <h3 style="font-size:16px;font-weight:700;">My Videos</h3>
-              <button class="btn btn-orange" onclick="document.getElementById('video-upload-input').click()" style="padding:8px 16px;font-size:13px;">
-                + Add Video
-              </button>
-              <input type="file" id="video-upload-input" accept="video/*" class="hidden" onchange="addVideo(event)" />
-            </div>
-
-            <div id="video-grid" class="video-grid"></div>
-            <div id="no-videos" style="text-align:center;padding:40px 20px;color:#71717a;display:none;">
-              No videos yet. Upload your first video!
-            </div>
+          <div id="video-grid" class="video-grid"></div>
+          <div id="no-videos" style="text-align:center;padding:40px 20px;color:#71717a;display:none;">
+            No videos yet. Upload your first video!
           </div>
         </div>
       </div>
 
       <div id="prof-status" style="text-align:center;padding:0 0 20px;"></div>
     </div>
-
-    <!-- EDIT MODAL -->
-    <div id="edit-modal" class="modal-overlay hidden">
-      <div class="modal-box">
-        <div class="modal-head">
-          <h2 style="font-size:18px;font-weight:700;">✏️ Edit Profile</h2>
-          <button onclick="closeEdit()" style="background:none;border:none;color:#71717a;font-size:26px;cursor:pointer;line-height:1;">×</button>
-        </div>
-
-        <div class="modal-body">
-          <div class="grid2">
-            <div><label>Full Name</label><input id="e-name" /></div>
-            <div><label>Email</label><input id="e-email" type="email" /></div>
-            <div><label>Phone</label><input id="e-phone" /></div>
-            <div><label>Age</label><input id="e-age" type="number" /></div>
-            <div>
-              <label>Gender</label>
-              <select id="e-gender">
-                <option value="">Select</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Prefer not to say</option>
-              </select>
-            </div>
-            <div><label>Birthday</label><input id="e-bday" type="date" /></div>
-            <div style="grid-column:span 2"><label>Address</label><input id="e-addr" /></div>
-            <div style="grid-column:span 2"><label>Bio</label><textarea id="e-bio" rows="3"></textarea></div>
-          </div>
-        </div>
-
-        <div class="modal-foot">
-          <button class="btn-ghost" style="flex:1;" onclick="closeEdit()">Cancel</button>
-          <button class="btn btn-orange" style="flex:1;justify-content:center;" onclick="saveEdit()">Save All Changes</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getFirestore, getDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
-      authDomain: "reyliveserver-73cba.firebaseapp.com",
-      projectId: "reyliveserver-73cba",
-      storageBucket: "reyliveserver-73cba.firebasestorage.app",
-      messagingSenderId: "220200732080",
-      appId: "1:220200732080:web:463bceaa7189f7ad3b4275",
-      measurementId: "G-C2VZQGRDB4"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
-    window.db = getFirestore(app);
-    window.getDoc = getDoc;
-    window.setDoc = setDoc;
-    window.doc = doc;
-  </script>
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-  <script>
     let cu = null;
 
-    function saveMe(user) {
-      localStorage.setItem("me", JSON.stringify(user));
-    }
-
-    function sg(key) {
-      return localStorage.getItem(key);
-    }
+    const $ = (id) => document.getElementById(id);
 
     function showAuthStatus(msg, ok) {
-      const el = document.getElementById("auth-status");
-      el.innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
+      $("auth-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
     }
 
     function showProfStatus(msg, ok) {
-      const el = document.getElementById("prof-status");
-      el.innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
+      $("prof-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
     }
 
-    function switchTab(t) {
-      document.getElementById("login-form").classList.toggle("hidden", t !== 0);
-      document.getElementById("signup-form").classList.toggle("hidden", t !== 1);
-
-      document.getElementById("tab-login").className = t === 0 ? "tab-active" : "";
-      document.getElementById("tab-signup").className = t === 1 ? "tab-active" : "";
-
-      document.getElementById("tab-login").style.color = t === 0 ? "" : "#71717a";
-      document.getElementById("tab-signup").style.color = t === 1 ? "" : "#71717a";
+    function saveLocal(user) {
+      localStorage.setItem("me", JSON.stringify(user));
     }
 
-    function togglePw(inputId, btnId) {
-      const input = document.getElementById(inputId);
-      const btn = document.getElementById(btnId);
-      input.type = input.type === "password" ? "text" : "password";
-      btn.textContent = input.type === "password" ? "👁" : "🙈";
+    async function saveUserToDb(user) {
+      await setDoc(doc(db, "users", user.username), user, { merge: true });
     }
 
-    function persistUser(user) {
+    async function persistUser(user) {
       cu = user;
-      saveMe(user);
-      showProfile(user);
-    }
-
-    function showProfile(user) {
-      document.getElementById("auth-wrap").classList.add("hidden");
-      document.getElementById("profile-wrap").classList.remove("hidden");
+      saveLocal(user);
+      await saveUserToDb(user);
       renderProfile(user);
       renderVideos();
     }
 
-    function loadProfile(user) {
-      cu = user;
-      showProfile(user);
+    function switchTab(t) {
+      $("login-form").classList.toggle("hidden", t !== 0);
+      $("signup-form").classList.toggle("hidden", t !== 1);
+      $("tab-login").className = t === 0 ? "tab-active" : "";
+      $("tab-signup").className = t === 1 ? "tab-active" : "";
+      $("tab-login").style.color = t === 0 ? "" : "#71717a";
+      $("tab-signup").style.color = t === 1 ? "" : "#71717a";
+    }
+
+    function togglePw(inputId, btnId) {
+      const input = $(inputId);
+      const btn = $(btnId);
+      input.type = input.type === "password" ? "text" : "password";
+      btn.textContent = input.type === "password" ? "👁" : "🙈";
     }
 
     function renderProfile(user) {
-      document.getElementById("p-name").textContent = user.name || user.username || "User";
-      document.getElementById("p-username-tag").textContent = user.username ? `@${user.username}` : "";
-      document.getElementById("p-fullname").textContent = user.name || "—";
-      document.getElementById("p-age").textContent = user.age || "—";
-      document.getElementById("p-gender").textContent = user.gender || "—";
-      document.getElementById("p-bday").textContent = user.birthday || "—";
-      document.getElementById("p-email").textContent = user.email || "—";
-      document.getElementById("p-phone").textContent = user.phone || "—";
-      document.getElementById("p-addr").textContent = user.address || "—";
-      document.getElementById("p-about").textContent = user.bio || "Welcome to my profile.";
-      document.getElementById("p-bio").textContent = user.bio || "No bio added";
+      $("auth-wrap").classList.add("hidden");
+      $("profile-wrap").classList.remove("hidden");
 
-      const letter = (user.name || user.username || "U").charAt(0).toUpperCase();
-      document.getElementById("avatar-letter").textContent = letter;
-
-      const avatarImg = document.getElementById("avatar-img");
-      const avatarLetter = document.getElementById("avatar-letter");
-
-      if (user.avatar) {
-        avatarImg.src = user.avatar;
-        avatarImg.style.display = "block";
-        avatarLetter.style.display = "none";
-      } else {
-        avatarImg.style.display = "none";
-        avatarLetter.style.display = "block";
-      }
-
-      if (user.cover) {
-        document.getElementById("cover-bg").style.backgroundImage = `url(${user.cover})`;
-        document.getElementById("cover-bg").style.backgroundSize = "cover";
-        document.getElementById("cover-bg").style.backgroundPosition = "center";
-      }
+      $("p-name").textContent = user.name || user.username || "User";
+      $("p-username-tag").textContent = user.username ? `@${user.username}` : "";
+      $("p-bio").textContent = user.bio || "No bio added";
     }
 
     async function doSignup() {
-      const username = document.getElementById("s-user").value.trim();
-      const name = document.getElementById("s-name").value.trim();
-      const email = document.getElementById("s-email").value.trim();
-      const phone = document.getElementById("s-phone").value.trim();
-      const password = document.getElementById("s-pass").value;
-      const age = document.getElementById("s-age").value.trim();
-      const gender = document.getElementById("s-gender").value;
-      const birthday = document.getElementById("s-bday").value;
-      const address = document.getElementById("s-addr").value.trim();
-      const bio = document.getElementById("s-bio").value.trim();
+      const user = {
+        username: $("s-user").value.trim(),
+        name: $("s-name").value.trim(),
+        email: $("s-email").value.trim(),
+        phone: $("s-phone").value.trim(),
+        password: $("s-pass").value,
+        age: $("s-age").value.trim(),
+        gender: $("s-gender").value,
+        birthday: $("s-bday").value,
+        address: $("s-addr").value.trim(),
+        bio: $("s-bio").value.trim(),
+        videos: []
+      };
 
-      if (!username || !name || !email || !password) {
+      if (!user.username || !user.name || !user.email || !user.password) {
         showAuthStatus("Please fill in all required fields.", false);
         return;
       }
 
-      const user = {
-        username,
-        name,
-        email,
-        phone,
-        password,
-        age,
-        gender,
-        birthday,
-        address,
-        bio,
-        videos: []
-      };
-
-      saveMe(user);
-      cu = user;
+      await persistUser(user);
       showAuthStatus("Account created successfully!", true);
-      showProfile(user);
     }
 
     function doLogin() {
-      const username = document.getElementById("l-user").value.trim();
-      const password = document.getElementById("l-pass").value;
-
+      const username = $("l-user").value.trim();
+      const password = $("l-pass").value;
       const saved = JSON.parse(localStorage.getItem("me") || "null");
 
       if (!saved) {
@@ -684,75 +458,47 @@
       if (saved.username === username && saved.password === password) {
         cu = saved;
         showAuthStatus("Login successful!", true);
-        showProfile(saved);
+        renderProfile(saved);
+        renderVideos();
       } else {
         showAuthStatus("Invalid username or password.", false);
       }
     }
 
     function doLogout() {
-      document.getElementById("profile-wrap").classList.add("hidden");
-      document.getElementById("auth-wrap").classList.remove("hidden");
-      showAuthStatus("Logged out.", true);
+      $("profile-wrap").classList.add("hidden");
+      $("auth-wrap").classList.remove("hidden");
     }
 
-    function changeAvatar(event) {
-      const file = event.target.files[0];
+    async function addVideo(e) {
+      const file = e.target.files[0];
       if (!file || !cu) return;
 
-      const previewUrl = URL.createObjectURL(file);
-      cu.avatar = previewUrl;
-      persistUser(cu);
-      showProfStatus("Avatar updated!", true);
-    }
+      try {
+        const videoRef = ref(storage, `videos/${cu.username}/${Date.now()}-${file.name}`);
+        await uploadBytes(videoRef, file);
+        const downloadURL = await getDownloadURL(videoRef);
 
-    function changeCover(event) {
-      const file = event.target.files[0];
-      if (!file || !cu) return;
+        const videoData = {
+          url: downloadURL,
+          title: file.name,
+          addedAt: new Date().toISOString()
+        };
 
-      const previewUrl = URL.createObjectURL(file);
-      cu.cover = previewUrl;
-      persistUser(cu);
-      showProfStatus("Cover photo updated!", true);
-    }
+        cu.videos = cu.videos || [];
+        cu.videos.push(videoData);
 
-    function openEdit() {
-      if (!cu) return;
-      document.getElementById("e-name").value = cu.name || "";
-      document.getElementById("e-email").value = cu.email || "";
-      document.getElementById("e-phone").value = cu.phone || "";
-      document.getElementById("e-age").value = cu.age || "";
-      document.getElementById("e-gender").value = cu.gender || "";
-      document.getElementById("e-bday").value = cu.birthday || "";
-      document.getElementById("e-addr").value = cu.address || "";
-      document.getElementById("e-bio").value = cu.bio || "";
-      document.getElementById("edit-modal").classList.remove("hidden");
-    }
-
-    function closeEdit() {
-      document.getElementById("edit-modal").classList.add("hidden");
-    }
-
-    function saveEdit() {
-      if (!cu) return;
-
-      cu.name = document.getElementById("e-name").value.trim();
-      cu.email = document.getElementById("e-email").value.trim();
-      cu.phone = document.getElementById("e-phone").value.trim();
-      cu.age = document.getElementById("e-age").value.trim();
-      cu.gender = document.getElementById("e-gender").value;
-      cu.birthday = document.getElementById("e-bday").value;
-      cu.address = document.getElementById("e-addr").value.trim();
-      cu.bio = document.getElementById("e-bio").value.trim();
-
-      persistUser(cu);
-      closeEdit();
-      showProfStatus("Profile updated successfully!", true);
+        await persistUser(cu);
+        showProfStatus("Video uploaded and saved successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to upload video.", false);
+      }
     }
 
     function renderVideos() {
-      const container = document.getElementById("video-grid");
-      const noVideos = document.getElementById("no-videos");
+      const container = $("video-grid");
+      const noVideos = $("no-videos");
       container.innerHTML = "";
 
       const videos = cu?.videos || [];
@@ -772,9 +518,9 @@
             <video src="${video.url}" controls preload="metadata"></video>
           </div>
           <div class="video-info">
-            <div class="video-title">${video.title || "Untitled Video"}</div>
+            <div style="font-size:14px;font-weight:600;word-break:break-word;">${video.title || "Untitled Video"}</div>
             <div style="font-size:12px;color:#71717a;">${new Date(video.addedAt).toLocaleDateString()}</div>
-            <div class="video-actions">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
               <button onclick="renameVideo(${index})" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
             </div>
@@ -784,73 +530,43 @@
       });
     }
 
-    function addVideo(e) {
-      const file = e.target.files[0];
-      if (!file || !cu) return;
-
-      const previewUrl = URL.createObjectURL(file);
-
-      const videoData = {
-        url: previewUrl,
-        title: file.name,
-        addedAt: new Date().toISOString()
-      };
-
-      if (!cu.videos) cu.videos = [];
-      cu.videos.push(videoData);
-
-      persistUser(cu);
-      renderVideos();
-      showProfStatus("Video added!", true);
-    }
-
-    function deleteVideo(index) {
+    async function deleteVideo(index) {
       if (!cu?.videos?.length) return;
       if (!confirm("Delete this video?")) return;
 
       cu.videos.splice(index, 1);
-      persistUser(cu);
-      renderVideos();
+      await persistUser(cu);
       showProfStatus("Video deleted.", true);
     }
 
-    function renameVideo(index) {
+    async function renameVideo(index) {
       if (!cu?.videos?.length) return;
 
       const newTitle = prompt("New title:", cu.videos[index].title || "");
       if (newTitle === null) return;
 
       cu.videos[index].title = newTitle.trim() || "Untitled Video";
-      persistUser(cu);
-      renderVideos();
+      await persistUser(cu);
       showProfStatus("Video renamed.", true);
     }
-
-    window.onload = function () {
-      const d = sg("me");
-      if (d) {
-        try {
-          const u = JSON.parse(d);
-          if (u) loadProfile(u);
-        } catch (e) {
-          console.error("Invalid saved data");
-        }
-      }
-    };
 
     window.switchTab = switchTab;
     window.togglePw = togglePw;
     window.doSignup = doSignup;
     window.doLogin = doLogin;
-    window.openEdit = openEdit;
-    window.closeEdit = closeEdit;
-    window.saveEdit = saveEdit;
     window.doLogout = doLogout;
-    window.changeAvatar = changeAvatar;
-    window.changeCover = changeCover;
     window.addVideo = addVideo;
     window.deleteVideo = deleteVideo;
     window.renameVideo = renameVideo;
+
+    window.onload = async function () {
+      const saved = JSON.parse(localStorage.getItem("me") || "null");
+      if (saved) {
+        cu = saved;
+        renderProfile(saved);
+        renderVideos();
+      }
+    };
   </script>
 </body>
 </html>
