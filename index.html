@@ -97,7 +97,7 @@
 }
 
 </style>
-<style>
+ 
  <head>
  /* Videos Grid Styling */
 .video-grid {
@@ -854,7 +854,101 @@ function renameVideo(index) {
      console.error(err);
     }
   }
+  // --- Core Video Functions ---
+  function renderVideos() {
+    const container = document.getElementById('video-grid');
+    const noVideos = document.getElementById('no-videos');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const videos = cu.videos || [];
+    
+    if (videos.length === 0) {
+      if(noVideos) noVideos.style.display = 'block';
+      return;
+    }
+    
+    if(noVideos) noVideos.style.display = 'none';
 
+    videos.forEach((video, index) => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <div class="video-player">
+          <video src="${video.url}" controls></video>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${video.title || 'Untitled Video'}</div>
+          <div class="video-actions">
+            <button onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function addVideo(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 12 * 1024 * 1024) {
+      alert("Video is too large! Please keep it under 12MB for database storage.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const videoData = {
+        url: ev.target.result,
+        title: file.name,
+        addedAt: new Date().toISOString()
+      };
+      
+      if (!cu.videos) cu.videos = [];
+      cu.videos.push(videoData);
+      
+      persistUser(cu);
+      renderVideos();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function deleteVideo(index) {
+    if (!confirm('Delete this video?')) return;
+    cu.videos.splice(index, 1);
+    persistUser(cu);
+    renderVideos();
+  }
+</script>
+<script>
+  window.onload = function(){
+    const d = sg('me');
+    if(d){ try{ const u = JSON.parse(d); if(u) loadProfile(u); }catch(e){} }
+  };
+
+  // Exposing layouts cleanly to window scope
+  window.switchTab = switchTab;
+  window.togglePw = togglePw;
+  window.doSignup = doSignup;
+  window.doLogin = doLogin;
+  window.openEdit = openEdit;
+  window.closeEdit = closeEdit;
+  window.saveEdit = saveEdit;
+  window.doLogout = doLogout;
+  window.changeAvatar = changeAvatar;
+  window.changeCover = changeCover;
+  window.changeAvatarFromModal = changeAvatarFromModal;
+  window.deleteAccount = deleteAccount;
+  
+  // Exposing Video Elements globally
+  window.addVideo = addVideo;
+  window.deleteVideo = deleteVideo;
+  window.renderVideos = renderVideos;
+
+</script>
+</body>
+</html>
 
 
 
@@ -1502,6 +1596,7 @@ function renameVideo(index) {
     document.getElementById('auth-wrap').classList.add('hidden');
     document.getElementById('profile-wrap').classList.remove('hidden');
     renderProfile();
+    renderVideos();
   }
 
   function renderProfile(){
