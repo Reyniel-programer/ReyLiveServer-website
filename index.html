@@ -248,8 +248,8 @@
           <div id="login-form">
             <div style="display:flex;flex-direction:column;gap:14px;">
               <div>
-                <label>Username</label>
-                <input id="l-user" placeholder="Enter username" />
+                <label>Email</label>
+                <input id="l-email" type="email" placeholder="Enter email" />
               </div>
 
               <div>
@@ -319,9 +319,12 @@
         <div id="cover-bg" style="width:100%;height:100%;background:linear-gradient(135deg,#1d4ed8,#38bdf8);background-size:cover;background-position:center;"></div>
       </div>
 
-      <div style="background:#18181b;padding:24px;border-bottom:1px solid #27272a;">
-        <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
-        <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
+      <div style="background:#18181b;padding:24px;border-bottom:1px solid #27272a;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div>
+          <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
+          <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
+        </div>
+        <button class="btn btn-ghost" onclick="doLogout()">Log Out</button>
       </div>
 
       <div class="profile-body" style="max-width:900px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:280px 1fr;gap:20px;">
@@ -352,8 +355,26 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
@@ -365,6 +386,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
@@ -380,20 +402,13 @@
       $("prof-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
     }
 
-    function saveLocal(user) {
-      localStorage.setItem("me", JSON.stringify(user));
-    }
-
     async function saveUserToDb(user) {
-      await setDoc(doc(db, "users", user.username), user, { merge: true });
+      await setDoc(doc(db, "users", user.uid), user, { merge: true });
     }
 
-    async function persistUser(user) {
-      cu = user;
-      saveLocal(user);
-      await saveUserToDb(user);
-      renderProfile(user);
-      renderVideos();
+    async function loadUserFromDb(uid) {
+      const snap = await getDoc(doc(db, "users", uid));
+      return snap.exists() ? snap.data() : null;
     }
 
     function switchTab(t) {
@@ -403,6 +418,7 @@
       $("tab-signup").className = t === 1 ? "tab-active" : "";
       $("tab-login").style.color = t === 0 ? "" : "#71717a";
       $("tab-signup").style.color = t === 1 ? "" : "#71717a";
+      $("auth-status").innerHTML = "";
     }
 
     function togglePw(inputId, btnId) {
@@ -421,13 +437,22 @@
       $("p-bio").textContent = user.bio || "No bio added";
     }
 
+    async function persistUser(user) {
+      cu = user;
+      await saveUserToDb(user);
+      renderProfile(user);
+      renderVideos();
+    }
+
     async function doSignup() {
+      const email = $("s-email").value.trim();
+      const password = $("s-pass").value;
+
       const user = {
         username: $("s-user").value.trim(),
         name: $("s-name").value.trim(),
-        email: $("s-email").value.trim(),
+        email,
         phone: $("s-phone").value.trim(),
-        password: $("s-pass").value,
         age: $("s-age").value.trim(),
         gender: $("s-gender").value,
         birthday: $("s-bday").value,
@@ -436,38 +461,72 @@
         videos: []
       };
 
-      if (!user.username || !user.name || !user.email || !user.password) {
+      if (!user.username || !user.name || !email || !password) {
         showAuthStatus("Please fill in all required fields.", false);
         return;
       }
 
-      await persistUser(user);
-      showAuthStatus("Account created successfully!", true);
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: user.name });
+
+        user.uid = cred.user.uid;
+        await persistUser(user);
+
+        showAuthStatus("Account created successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus(error.message || "Signup failed.", false);
+      }
     }
 
-    function doLogin() {
-      const username = $("l-user").value.trim();
+    async function doLogin() {
+      const email = $("l-email").value.trim();
       const password = $("l-pass").value;
-      const saved = JSON.parse(localStorage.getItem("me") || "null");
 
-      if (!saved) {
-        showAuthStatus("No account found. Please sign up first.", false);
+      if (!email || !password) {
+        showAuthStatus("Please enter your email and password.", false);
         return;
       }
 
-      if (saved.username === username && saved.password === password) {
-        cu = saved;
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const profile = await loadUserFromDb(cred.user.uid);
+
+        cu = profile || {
+          uid: cred.user.uid,
+          email: cred.user.email,
+          name: cred.user.displayName || "User",
+          username: cred.user.email.split("@")[0],
+          bio: "",
+          videos: []
+        };
+
+        if (!profile) {
+          await saveUserToDb(cu);
+        }
+
         showAuthStatus("Login successful!", true);
-        renderProfile(saved);
+        renderProfile(cu);
         renderVideos();
-      } else {
-        showAuthStatus("Invalid username or password.", false);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Invalid email or password.", false);
       }
     }
 
-    function doLogout() {
-      $("profile-wrap").classList.add("hidden");
-      $("auth-wrap").classList.remove("hidden");
+    async function doLogout() {
+      try {
+        await signOut(auth);
+        cu = null;
+        $("profile-wrap").classList.add("hidden");
+        $("auth-wrap").classList.remove("hidden");
+        $("prof-status").innerHTML = "";
+        showAuthStatus("Logged out successfully.", true);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Logout failed.", false);
+      }
     }
 
     async function addVideo(e) {
@@ -475,7 +534,7 @@
       if (!file || !cu) return;
 
       try {
-        const videoRef = ref(storage, `videos/${cu.username}/${Date.now()}-${file.name}`);
+        const videoRef = ref(storage, `videos/${cu.uid}/${Date.now()}-${file.name}`);
         await uploadBytes(videoRef, file);
         const downloadURL = await getDownloadURL(videoRef);
 
@@ -490,6 +549,7 @@
 
         await persistUser(cu);
         showProfStatus("Video uploaded and saved successfully!", true);
+        e.target.value = "";
       } catch (error) {
         console.error(error);
         showProfStatus("Failed to upload video.", false);
@@ -519,7 +579,7 @@
           </div>
           <div class="video-info">
             <div style="font-size:14px;font-weight:600;word-break:break-word;">${video.title || "Untitled Video"}</div>
-            <div style="font-size:12px;color:#71717a;">${new Date(video.addedAt).toLocaleDateString()}</div>
+            <div style="font-size:12px;color:#71717a;">${video.addedAt ? new Date(video.addedAt).toLocaleDateString() : ""}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
               <button onclick="renameVideo(${index})" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
@@ -559,13 +619,34 @@
     window.deleteVideo = deleteVideo;
     window.renameVideo = renameVideo;
 
-    window.onload = async function () {
-      const saved = JSON.parse(localStorage.getItem("me") || "null");
-      if (saved) {
-        cu = saved;
-        renderProfile(saved);
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const profile = await loadUserFromDb(user.uid);
+
+        cu = profile || {
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || "User",
+          username: user.email?.split("@")[0] || "user",
+          bio: "",
+          videos: []
+        };
+
+        if (!profile) {
+          await saveUserToDb(cu);
+        }
+
+        renderProfile(cu);
         renderVideos();
+      } else {
+        cu = null;
+        $("profile-wrap").classList.add("hidden");
+        $("auth-wrap").classList.remove("hidden");
       }
+    });
+
+    window.onload = function () {
+      switchTab(0);
     };
   </script>
 </body>
