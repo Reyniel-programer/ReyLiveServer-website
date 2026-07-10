@@ -361,7 +361,8 @@
       signInWithEmailAndPassword,
       signOut,
       onAuthStateChanged,
-      updateProfile
+      updateProfile,
+      sendEmailVerification
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import {
       getFirestore,
@@ -402,8 +403,8 @@
       $("prof-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
     }
 
-    async function saveUserToDb(user) {
-      await setDoc(doc(db, "users", user.uid), user, { merge: true });
+    async function saveUserToDb(userData) {
+      await setDoc(doc(db, "users", userData.uid), userData, { merge: true });
     }
 
     async function loadUserFromDb(uid) {
@@ -431,129 +432,9 @@
     function renderProfile(user) {
       $("auth-wrap").classList.add("hidden");
       $("profile-wrap").classList.remove("hidden");
-
       $("p-name").textContent = user.name || user.username || "User";
       $("p-username-tag").textContent = user.username ? `@${user.username}` : "";
       $("p-bio").textContent = user.bio || "No bio added";
-    }
-
-    async function persistUser(user) {
-      cu = user;
-      await saveUserToDb(user);
-      renderProfile(user);
-      renderVideos();
-    }
-
-    async function doSignup() {
-      const email = $("s-email").value.trim();
-      const password = $("s-pass").value;
-
-      const user = {
-        username: $("s-user").value.trim(),
-        name: $("s-name").value.trim(),
-        email,
-        phone: $("s-phone").value.trim(),
-        age: $("s-age").value.trim(),
-        gender: $("s-gender").value,
-        birthday: $("s-bday").value,
-        address: $("s-addr").value.trim(),
-        bio: $("s-bio").value.trim(),
-        videos: []
-      };
-
-      if (!user.username || !user.name || !email || !password) {
-        showAuthStatus("Please fill in all required fields.", false);
-        return;
-      }
-
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(cred.user, { displayName: user.name });
-
-        user.uid = cred.user.uid;
-        await persistUser(user);
-
-        showAuthStatus("Account created successfully!", true);
-      } catch (error) {
-        console.error(error);
-        showAuthStatus(error.message || "Signup failed.", false);
-      }
-    }
-
-    async function doLogin() {
-      const email = $("l-email").value.trim();
-      const password = $("l-pass").value;
-
-      if (!email || !password) {
-        showAuthStatus("Please enter your email and password.", false);
-        return;
-      }
-
-      try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const profile = await loadUserFromDb(cred.user.uid);
-
-        cu = profile || {
-          uid: cred.user.uid,
-          email: cred.user.email,
-          name: cred.user.displayName || "User",
-          username: cred.user.email.split("@")[0],
-          bio: "",
-          videos: []
-        };
-
-        if (!profile) {
-          await saveUserToDb(cu);
-        }
-
-        showAuthStatus("Login successful!", true);
-        renderProfile(cu);
-        renderVideos();
-      } catch (error) {
-        console.error(error);
-        showAuthStatus("Invalid email or password.", false);
-      }
-    }
-
-    async function doLogout() {
-      try {
-        await signOut(auth);
-        cu = null;
-        $("profile-wrap").classList.add("hidden");
-        $("auth-wrap").classList.remove("hidden");
-        $("prof-status").innerHTML = "";
-        showAuthStatus("Logged out successfully.", true);
-      } catch (error) {
-        console.error(error);
-        showAuthStatus("Logout failed.", false);
-      }
-    }
-
-    async function addVideo(e) {
-      const file = e.target.files[0];
-      if (!file || !cu) return;
-
-      try {
-        const videoRef = ref(storage, `videos/${cu.uid}/${Date.now()}-${file.name}`);
-        await uploadBytes(videoRef, file);
-        const downloadURL = await getDownloadURL(videoRef);
-
-        const videoData = {
-          url: downloadURL,
-          title: file.name,
-          addedAt: new Date().toISOString()
-        };
-
-        cu.videos = cu.videos || [];
-        cu.videos.push(videoData);
-
-        await persistUser(cu);
-        showProfStatus("Video uploaded and saved successfully!", true);
-        e.target.value = "";
-      } catch (error) {
-        console.error(error);
-        showProfStatus("Failed to upload video.", false);
-      }
     }
 
     function renderVideos() {
@@ -588,6 +469,146 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    async function persistUser(userData) {
+      cu = userData;
+      await saveUserToDb(userData);
+      renderProfile(userData);
+      renderVideos();
+    }
+
+    async function doSignup() {
+      const email = $("s-email").value.trim();
+      const password = $("s-pass").value.trim();
+
+      const user = {
+        username: $("s-user").value.trim(),
+        name: $("s-name").value.trim(),
+        email,
+        phone: $("s-phone").value.trim(),
+        age: $("s-age").value.trim(),
+        gender: $("s-gender").value,
+        birthday: $("s-bday").value,
+        address: $("s-addr").value.trim(),
+        bio: $("s-bio").value.trim(),
+        videos: [],
+        createdAt: new Date().toISOString()
+      };
+
+      if (!user.username || !user.name || !email || !password) {
+        showAuthStatus("Please fill in all required fields.", false);
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthStatus("Password must be at least 6 characters.", false);
+        return;
+      }
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: user.name });
+
+        await sendEmailVerification(cred.user);
+
+        user.uid = cred.user.uid;
+        user.emailVerified = cred.user.emailVerified;
+
+        await saveUserToDb(user);
+
+        showAuthStatus("Account created. Please verify your email before logging in.", true);
+
+        await signOut(auth);
+        switchTab(0);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus(error.message || "Signup failed.", false);
+      }
+    }
+
+    async function doLogin() {
+      const email = $("l-email").value.trim();
+      const password = $("l-pass").value.trim();
+
+      if (!email || !password) {
+        showAuthStatus("Please enter your email and password.", false);
+        return;
+      }
+
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+
+        if (!cred.user.emailVerified) {
+          await sendEmailVerification(cred.user);
+          await signOut(auth);
+          showAuthStatus("Please verify your email first. A new verification email was sent.", false);
+          return;
+        }
+
+        const profile = await loadUserFromDb(cred.user.uid);
+
+        cu = profile || {
+          uid: cred.user.uid,
+          email: cred.user.email,
+          name: cred.user.displayName || "User",
+          username: cred.user.email?.split("@")[0] || "user",
+          bio: "",
+          videos: []
+        };
+
+        if (!profile) {
+          await saveUserToDb(cu);
+        }
+
+        showAuthStatus("Login successful!", true);
+        renderProfile(cu);
+        renderVideos();
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Invalid email or password.", false);
+      }
+    }
+
+    async function doLogout() {
+      try {
+        await signOut(auth);
+        cu = null;
+        $("profile-wrap").classList.add("hidden");
+        $("auth-wrap").classList.remove("hidden");
+        $("prof-status").innerHTML = "";
+        showAuthStatus("Logged out successfully.", true);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Logout failed.", false);
+      }
+    }
+
+    async function addVideo(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        const videoRef = ref(storage, `videos/${cu.uid}/${Date.now()}-${file.name}`);
+        await uploadBytes(videoRef, file);
+        const downloadURL = await getDownloadURL(videoRef);
+
+        const videoData = {
+          url: downloadURL,
+          title: file.name,
+          addedAt: new Date().toISOString()
+        };
+
+        cu.videos = Array.isArray(cu.videos) ? cu.videos : [];
+        cu.videos.push(videoData);
+
+        await persistUser(cu);
+        showProfStatus("Video uploaded and saved successfully!", true);
+        e.target.value = "";
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to upload video. Check Firebase Storage rules/CORS.", false);
+      }
     }
 
     async function deleteVideo(index) {
@@ -645,7 +666,7 @@
       }
     });
 
-    window.onload = function () {
+    window.onload = () => {
       switchTab(0);
     };
   </script>
