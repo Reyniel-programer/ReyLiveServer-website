@@ -352,6 +352,7 @@
 
     function setStatus(elId, msg, ok) {
       const el = $(elId);
+      if (!el) return;
       el.innerHTML = "";
       const div = document.createElement("div");
       div.className = "status-bar";
@@ -369,7 +370,8 @@
     }
 
     function isPermissionError(error) {
-      return String(error?.code || "").includes("permission-denied");
+      const code = String(error?.code || "");
+      return code.includes("permission-denied") || code.includes("unauthorized");
     }
 
     async function saveUserToDb(userData) {
@@ -412,7 +414,7 @@
       const noVideos = $("no-videos");
       container.innerHTML = "";
 
-      const videos = cu?.videos || [];
+      const videos = Array.isArray(cu?.videos) ? cu.videos : [];
 
       if (videos.length === 0) {
         noVideos.style.display = "block";
@@ -488,7 +490,7 @@
       } catch (error) {
         console.error(error);
         if (isPermissionError(error)) {
-          showAuthStatus("Missing or insufficient permission. Check Firebase Firestore/Storage rules.", false);
+          showAuthStatus("Missing or insufficient permission. Check Firestore rules.", false);
         } else {
           showAuthStatus(error.message || "Signup failed.", false);
         }
@@ -533,7 +535,7 @@
       } catch (error) {
         console.error(error);
         if (isPermissionError(error)) {
-          showAuthStatus("Missing or insufficient permission. Check Firebase security rules.", false);
+          showAuthStatus("Missing or insufficient permission. Check Firestore security rules.", false);
         } else {
           showAuthStatus("Invalid email or password.", false);
         }
@@ -559,7 +561,8 @@
       if (!file || !cu) return;
 
       try {
-        const videoRef = ref(storage, `videos/${cu.uid}/${Date.now()}-${file.name}`);
+        const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+        const videoRef = ref(storage, `videos/${cu.uid}/${Date.now()}-${safeName}`);
         await uploadBytes(videoRef, file);
         const downloadURL = await getDownloadURL(videoRef);
 
