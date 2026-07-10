@@ -111,12 +111,6 @@
       max-width: 90%;
     }
 
-    .grid2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
     .rel-pw {
       position: relative;
     }
@@ -171,14 +165,6 @@
     }
 
     @media (max-width: 700px) {
-      .grid2 {
-        grid-template-columns: 1fr;
-      }
-
-      .profile-body {
-        grid-template-columns: 1fr !important;
-      }
-
       .video-grid {
         grid-template-columns: 1fr;
       }
@@ -450,8 +436,7 @@
         address: $("s-addr").value.trim(),
         bio: $("s-bio").value.trim(),
         videos: [],
-        createdAt: new Date().toISOString(),
-        emailVerified: false
+        createdAt: new Date().toISOString()
       };
 
       if (!user.username || !user.name || !email || !password) {
@@ -469,7 +454,6 @@
         await updateProfile(cred.user, { displayName: user.name });
 
         user.uid = cred.user.uid;
-        user.emailVerified = cred.user.emailVerified;
 
         await saveUserToDb(user);
 
@@ -553,7 +537,7 @@
         e.target.value = "";
       } catch (error) {
         console.error(error);
-        showProfStatus("Failed to upload video. Check Firebase Storage rules/CORS.", false);
+        showProfStatus("Failed to upload video. Check Firebase Storage rules.", false);
       }
     }
 
