@@ -213,6 +213,22 @@
       border: 1px solid #27272a;
     }
 
+    .code-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .code-number {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: #f59e0b;
+      margin-top: 8px;
+    }
+
     @media (max-width: 700px) {
       .grid2 {
         grid-template-columns: 1fr;
@@ -299,7 +315,24 @@
               <div><label>Birthday</label><input id="s-bday" type="date" /></div>
               <div style="grid-column:span 2"><label>Address</label><input id="s-addr" placeholder="Your address" /></div>
               <div style="grid-column:span 2"><label>Bio</label><textarea id="s-bio" rows="2" placeholder="Tell something about yourself"></textarea></div>
-              <div style="grid-column:span 2"><button class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doSignup()">Create Account</button></div>
+
+              <div style="grid-column:span 2">
+                <button class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doSignup()">Create Account</button>
+              </div>
+            </div>
+
+            <!-- NEW VERIFICATION CODE CONTAINER -->
+            <div id="verification-container" class="hidden" style="margin-top:18px;">
+              <div class="code-box">
+                <div style="font-size:14px;color:#cbd5e1;">Your verification code</div>
+                <div id="verification-code" class="code-number">000000</div>
+                <p style="font-size:12px;color:#94a3b8;margin-top:10px;">
+                  Use this code for your email verification process.
+                </p>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+                <button class="btn btn-gray" style="flex:1;justify-content:center;" onclick="generateVerificationCode()">Generate New Code</button>
+              </div>
             </div>
 
             <p style="text-align:center;margin-top:14px;font-size:13px;color:#71717a;">
@@ -392,6 +425,7 @@
     const storage = getStorage(app);
 
     let cu = null;
+    let verificationCode = "";
 
     const $ = (id) => document.getElementById(id);
 
@@ -401,6 +435,12 @@
 
     function showProfStatus(msg, ok) {
       $("prof-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
+    }
+
+    function generateVerificationCode() {
+      verificationCode = String(Math.floor(100000 + Math.random() * 900000));
+      $("verification-code").textContent = verificationCode;
+      $("verification-container").classList.remove("hidden");
     }
 
     async function saveUserToDb(userData) {
@@ -420,6 +460,10 @@
       $("tab-login").style.color = t === 0 ? "" : "#71717a";
       $("tab-signup").style.color = t === 1 ? "" : "#71717a";
       $("auth-status").innerHTML = "";
+
+      if (t === 1) {
+        generateVerificationCode();
+      }
     }
 
     function togglePw(inputId, btnId) {
@@ -493,7 +537,9 @@
         address: $("s-addr").value.trim(),
         bio: $("s-bio").value.trim(),
         videos: [],
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        emailVerified: false,
+        verificationCode: verificationCode
       };
 
       if (!user.username || !user.name || !email || !password) {
@@ -510,14 +556,14 @@
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: user.name });
 
-        await sendEmailVerification(cred.user);
-
         user.uid = cred.user.uid;
-        user.emailVerified = cred.user.emailVerified;
-
         await saveUserToDb(user);
 
-        showAuthStatus("Account created. Please verify your email before logging in.", true);
+        await sendEmailVerification(cred.user);
+
+        showAuthStatus("Account created. Verification email sent. Check your email and verify before logging in.", true);
+        $("verification-container").classList.remove("hidden");
+        $("verification-code").textContent = verificationCode;
 
         await signOut(auth);
         switchTab(0);
@@ -540,9 +586,8 @@
         const cred = await signInWithEmailAndPassword(auth, email, password);
 
         if (!cred.user.emailVerified) {
-          await sendEmailVerification(cred.user);
           await signOut(auth);
-          showAuthStatus("Please verify your email first. A new verification email was sent.", false);
+          showAuthStatus("Please verify your email first before logging in.", false);
           return;
         }
 
@@ -639,6 +684,7 @@
     window.addVideo = addVideo;
     window.deleteVideo = deleteVideo;
     window.renameVideo = renameVideo;
+    window.generateVerificationCode = generateVerificationCode;
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -668,7 +714,9 @@
 
     window.onload = () => {
       switchTab(0);
+      generateVerificationCode();
     };
   </script>
 </body>
 </html>
+ 
