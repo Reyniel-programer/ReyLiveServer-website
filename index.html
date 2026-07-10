@@ -165,6 +165,23 @@
       border: 1px solid #27272a;
     }
 
+    .media-preview {
+      width: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0f172a;
+      border: 1px solid #3f3f46;
+      margin-bottom: 12px;
+    }
+
+    .media-preview img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      background: #111827;
+    }
+
     @media (max-width: 700px) {
       .video-grid {
         grid-template-columns: 1fr;
@@ -286,6 +303,28 @@
 
       <div class="profile-body" style="max-width:900px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:280px 1fr;gap:20px;">
         <div class="section-box">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile Media</h3>
+
+          <div class="media-preview">
+            <img id="profile-image-preview" src="" alt="Profile Image" class="hidden" />
+          </div>
+
+          <button type="button" class="btn btn-gray" style="width:100%;justify-content:center;margin-bottom:12px;" onclick="document.getElementById('profile-upload-input').click()">
+            Upload Profile Image
+          </button>
+          <input type="file" id="profile-upload-input" accept="image/*" class="hidden" onchange="addProfileImage(event)" />
+
+          <div class="media-preview">
+            <img id="cover-image-preview" src="" alt="Cover Image" class="hidden" />
+          </div>
+
+          <button type="button" class="btn btn-gray" style="width:100%;justify-content:center;" onclick="document.getElementById('cover-upload-input').click()">
+            Upload Cover Image
+          </button>
+          <input type="file" id="cover-upload-input" accept="image/*" class="hidden" onchange="addCoverImage(event)" />
+
+          <hr style="border-color:#27272a;margin:16px 0;">
+
           <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Intro</h3>
           <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
         </div>
@@ -407,6 +446,22 @@
       $("p-name").textContent = user?.name || user?.username || "User";
       $("p-username-tag").textContent = user?.username ? `@${user.username}` : "";
       $("p-bio").textContent = user?.bio || "No bio added";
+
+      if (user?.profileImage) {
+        $("profile-image-preview").src = user.profileImage;
+        $("profile-image-preview").classList.remove("hidden");
+      } else {
+        $("profile-image-preview").classList.add("hidden");
+      }
+
+      if (user?.coverImage) {
+        $("cover-bg").style.backgroundImage = `url('${user.coverImage}')`;
+        $("cover-image-preview").src = user.coverImage;
+        $("cover-image-preview").classList.remove("hidden");
+      } else {
+        $("cover-bg").style.backgroundImage = "linear-gradient(135deg,#1d4ed8,#38bdf8)";
+        $("cover-image-preview").classList.add("hidden");
+      }
     }
 
     function renderVideos() {
@@ -428,11 +483,11 @@
         card.className = "video-card";
         card.innerHTML = `
           <div class="video-player">
-            <video src="${video.url}" controls preload="metadata"></video>
+            <video src="${video?.url || ""}" controls preload="metadata"></video>
           </div>
           <div class="video-info">
-            <div style="font-size:14px;font-weight:600;word-break:break-word;">${video.title || "Untitled Video"}</div>
-            <div style="font-size:12px;color:#71717a;">${video.addedAt ? new Date(video.addedAt).toLocaleDateString() : ""}</div>
+            <div style="font-size:14px;font-weight:600;word-break:break-word;">${video?.title || "Untitled Video"}</div>
+            <div style="font-size:12px;color:#71717a;">${video?.addedAt ? new Date(video.addedAt).toLocaleDateString() : ""}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button type="button" onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
               <button type="button" onclick="renameVideo(${index})" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
@@ -450,6 +505,13 @@
       renderVideos();
     }
 
+    async function uploadMedia(file, folder) {
+      const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+      const fileRef = ref(storage, `${folder}/${cu.uid}/${Date.now()}-${safeName}`);
+      await uploadBytes(fileRef, file);
+      return await getDownloadURL(fileRef);
+    }
+
     async function doSignup() {
       const email = $("s-email").value.trim();
       const password = $("s-pass").value.trim();
@@ -464,6 +526,8 @@
         birthday: $("s-bday").value,
         address: $("s-addr").value.trim(),
         bio: $("s-bio").value.trim(),
+        profileImage: "",
+        coverImage: "",
         videos: [],
         createdAt: new Date().toISOString()
       };
@@ -489,11 +553,7 @@
         switchTab(0);
       } catch (error) {
         console.error(error);
-        if (isPermissionError(error)) {
-          showAuthStatus("Missing or insufficient permission. Check Firestore rules.", false);
-        } else {
-          showAuthStatus(error.message || "Signup failed.", false);
-        }
+        showAuthStatus(error.message || "Signup failed.", false);
       }
     }
 
@@ -521,6 +581,8 @@
           birthday: "",
           address: "",
           bio: "",
+          profileImage: "",
+          coverImage: "",
           videos: [],
           createdAt: new Date().toISOString()
         };
@@ -536,11 +598,7 @@
         renderVideos();
       } catch (error) {
         console.error(error);
-        if (isPermissionError(error)) {
-          showAuthStatus("Missing or insufficient permission. Check Firestore security rules.", false);
-        } else {
-          showAuthStatus("Invalid email or password.", false);
-        }
+        showAuthStatus("Invalid email or password.", false);
       }
     }
 
@@ -558,18 +616,46 @@
       }
     }
 
+    async function addProfileImage(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        const url = await uploadMedia(file, "profile-images");
+        cu.profileImage = url;
+        await persistUser(cu);
+        showProfStatus("Profile image uploaded successfully!", true);
+        e.target.value = "";
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to upload profile image.", false);
+      }
+    }
+
+    async function addCoverImage(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        const url = await uploadMedia(file, "cover-images");
+        cu.coverImage = url;
+        await persistUser(cu);
+        showProfStatus("Cover image uploaded successfully!", true);
+        e.target.value = "";
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to upload cover image.", false);
+      }
+    }
+
     async function addVideo(e) {
       const file = e.target.files?.[0];
       if (!file || !cu) return;
 
       try {
-        const safeName = file.name.replace(/[^\w.\-]+/g, "_");
-        const videoRef = ref(storage, `videos/${cu.uid}/${Date.now()}-${safeName}`);
-        await uploadBytes(videoRef, file);
-        const downloadURL = await getDownloadURL(videoRef);
-
+        const url = await uploadMedia(file, "videos");
         const videoData = {
-          url: downloadURL,
+          url,
           title: file.name,
           addedAt: new Date().toISOString()
         };
@@ -582,11 +668,7 @@
         e.target.value = "";
       } catch (error) {
         console.error(error);
-        if (isPermissionError(error)) {
-          showProfStatus("Missing or insufficient permission. Update Firebase Storage rules.", false);
-        } else {
-          showProfStatus("Failed to upload video.", false);
-        }
+        showProfStatus("Failed to upload video.", false);
       }
     }
 
@@ -629,6 +711,8 @@
     window.addVideo = addVideo;
     window.deleteVideo = deleteVideo;
     window.renameVideo = renameVideo;
+    window.addProfileImage = addProfileImage;
+    window.addCoverImage = addCoverImage;
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -646,6 +730,8 @@
             birthday: "",
             address: "",
             bio: "",
+            profileImage: "",
+            coverImage: "",
             videos: [],
             createdAt: new Date().toISOString()
           };
@@ -660,9 +746,7 @@
           renderVideos();
         } catch (error) {
           console.error(error);
-          if (isPermissionError(error)) {
-            showAuthStatus("Missing or insufficient permission. Check Firestore rules.", false);
-          }
+          showAuthStatus("Failed to load profile.", false);
         }
       } else {
         cu = null;
