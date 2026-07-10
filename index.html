@@ -184,6 +184,7 @@
       letter-spacing: 6px;
       color: #f59e0b;
       margin-top: 8px;
+      min-height: 34px;
     }
 
     @media (max-width: 700px) {
@@ -212,8 +213,8 @@
         </div>
 
         <div style="display:flex;border-bottom:1px solid #27272a;">
-          <button onclick="switchTab(0)" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;">Login</button>
-          <button onclick="switchTab(1)" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;">Sign Up</button>
+          <button type="button" onclick="switchTab(0)" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;">Login</button>
+          <button type="button" onclick="switchTab(1)" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;">Sign Up</button>
         </div>
 
         <div style="padding:28px;">
@@ -232,7 +233,7 @@
                 </div>
               </div>
 
-              <button class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doLogin()">Sign In</button>
+              <button type="button" class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doLogin()">Sign In</button>
             </div>
 
             <p style="text-align:center;margin-top:16px;font-size:13px;color:#71717a;">
@@ -272,24 +273,8 @@
               <div style="grid-column:span 2"><label>Address</label><input id="s-addr" placeholder="Your address" /></div>
               <div style="grid-column:span 2"><label>Bio</label><textarea id="s-bio" rows="2" placeholder="Tell something about yourself"></textarea></div>
 
-              <!-- 6-digit verification code section -->
               <div style="grid-column:span 2">
-                <div class="code-box">
-                  <div style="font-size:14px;color:#cbd5e1;">Verification Code</div>
-                  <div id="verification-code" class="code-number">------</div>
-                  <p style="font-size:12px;color:#94a3b8;margin-top:10px;">
-                    Click Create Account to generate a random 6-digit code.
-                  </p>
-                </div>
-              </div>
-
-              <div style="grid-column:span 2">
-                <label>Enter Verification Code</label>
-                <input id="s-code" type="text" maxlength="6" placeholder="Enter 6-digit code" />
-              </div>
-
-              <div style="grid-column:span 2">
-                <button class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doSignup()">Create Account</button>
+                <button type="button" class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doSignup()">Create Account</button>
               </div>
             </div>
 
@@ -304,6 +289,36 @@
       </div>
     </div>
 
+    <!-- Separate verification container -->
+    <div id="verification-wrap" class="hidden" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f172a,#18181b)">
+      <div style="width:100%;max-width:420px;background:#18181b;border-radius:24px;border:1px solid #334155;overflow:hidden;padding:28px;">
+        <h2 style="color:#f59e0b;margin-bottom:10px;text-align:center;">Enter Verification Code</h2>
+        <p style="color:#94a3b8;font-size:13px;text-align:center;margin-bottom:18px;">
+          A 6-digit code has been generated. Please enter it below.
+        </p>
+
+        <div class="code-box" style="margin-bottom:16px;">
+          <div style="font-size:14px;color:#cbd5e1;">Verification Code</div>
+          <div id="verification-code" class="code-number">------</div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label>Enter Verification Code</label>
+          <input id="s-code" type="text" maxlength="6" placeholder="Enter 6-digit code" />
+        </div>
+
+        <button type="button" class="btn btn-orange" style="width:100%;justify-content:center;" onclick="verifyCode()">
+          Verify and Create Account
+        </button>
+
+        <button type="button" class="btn-ghost" style="width:100%;margin-top:10px;" onclick="cancelVerification()">
+          Cancel
+        </button>
+
+        <div id="verification-status" style="text-align:center;"></div>
+      </div>
+    </div>
+
     <div id="profile-wrap" class="hidden" style="background:#09090b;min-height:100vh;">
       <div style="height:220px;overflow:hidden;position:relative;">
         <div id="cover-bg" style="width:100%;height:100%;background:linear-gradient(135deg,#1d4ed8,#38bdf8);background-size:cover;background-position:center;"></div>
@@ -314,7 +329,7 @@
           <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
           <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
         </div>
-        <button class="btn btn-ghost" onclick="doLogout()">Log Out</button>
+        <button type="button" class="btn btn-ghost" onclick="doLogout()">Log Out</button>
       </div>
 
       <div class="profile-body" style="max-width:900px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:280px 1fr;gap:20px;">
@@ -326,7 +341,7 @@
         <div class="section-box">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;">
             <h3 style="font-size:16px;font-weight:700;">My Videos</h3>
-            <button class="btn btn-orange" onclick="document.getElementById('video-upload-input').click()" style="padding:8px 16px;font-size:13px;">
+            <button type="button" class="btn btn-orange" onclick="document.getElementById('video-upload-input').click()" style="padding:8px 16px;font-size:13px;">
               + Add Video
             </button>
             <input type="file" id="video-upload-input" accept="video/*" class="hidden" onchange="addVideo(event)" />
@@ -368,7 +383,7 @@
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
+      apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79aK",
       authDomain: "reyliveserver-73cba.firebaseapp.com",
       projectId: "reyliveserver-73cba",
       storageBucket: "reyliveserver-73cba.firebasestorage.app",
@@ -383,6 +398,7 @@
 
     let cu = null;
     let verificationCode = "";
+    let pendingUser = null;
 
     const $ = (id) => document.getElementById(id);
 
@@ -392,6 +408,10 @@
 
     function showProfStatus(msg, ok) {
       $("prof-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
+    }
+
+    function showVerificationStatus(msg, ok) {
+      $("verification-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
     }
 
     function generateVerificationCode() {
@@ -416,10 +436,6 @@
       $("tab-login").style.color = t === 0 ? "" : "#71717a";
       $("tab-signup").style.color = t === 1 ? "" : "#71717a";
       $("auth-status").innerHTML = "";
-
-      if (t === 1) {
-        generateVerificationCode();
-      }
     }
 
     function togglePw(inputId, btnId) {
@@ -429,8 +445,24 @@
       btn.textContent = input.type === "password" ? "👁" : "🙈";
     }
 
+    function showVerificationContainer() {
+      $("auth-wrap").classList.add("hidden");
+      $("verification-wrap").classList.remove("hidden");
+      $("verification-status").innerHTML = "";
+      $("s-code").value = "";
+      generateVerificationCode();
+    }
+
+    function hideVerificationContainer() {
+      $("verification-wrap").classList.add("hidden");
+      $("auth-wrap").classList.remove("hidden");
+      verificationCode = "";
+      pendingUser = null;
+    }
+
     function renderProfile(user) {
       $("auth-wrap").classList.add("hidden");
+      $("verification-wrap").classList.add("hidden");
       $("profile-wrap").classList.remove("hidden");
       $("p-name").textContent = user.name || user.username || "User";
       $("p-username-tag").textContent = user.username ? `@${user.username}` : "";
@@ -462,8 +494,8 @@
             <div style="font-size:14px;font-weight:600;word-break:break-word;">${video.title || "Untitled Video"}</div>
             <div style="font-size:12px;color:#71717a;">${video.addedAt ? new Date(video.addedAt).toLocaleDateString() : ""}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
-              <button onclick="renameVideo(${index})" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
+              <button type="button" onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
+              <button type="button" onclick="renameVideo(${index})" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
             </div>
           </div>
         `;
@@ -481,11 +513,6 @@
     async function doSignup() {
       const email = $("s-email").value.trim();
       const password = $("s-pass").value.trim();
-      const enteredCode = $("s-code").value.trim();
-
-      if (!verificationCode) {
-        generateVerificationCode();
-      }
 
       const user = {
         username: $("s-user").value.trim(),
@@ -499,8 +526,7 @@
         bio: $("s-bio").value.trim(),
         videos: [],
         createdAt: new Date().toISOString(),
-        emailVerified: false,
-        verificationCode: verificationCode
+        emailVerified: false
       };
 
       if (!user.username || !user.name || !email || !password) {
@@ -513,37 +539,54 @@
         return;
       }
 
+      pendingUser = { ...user, password };
+      showVerificationContainer();
+      showVerificationStatus("Verification code generated. Enter it to continue.", true);
+    }
+
+    async function verifyCode() {
+      const enteredCode = $("s-code").value.trim();
+
       if (!enteredCode) {
-        showAuthStatus("Please enter the 6-digit verification code.", false);
+        showVerificationStatus("Please enter the 6-digit verification code.", false);
         return;
       }
 
       if (enteredCode !== verificationCode) {
-        showAuthStatus("Wrong verification code. Please try again.", false);
+        showVerificationStatus("Wrong verification code. Please try again.", false);
         generateVerificationCode();
         return;
       }
 
       try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(cred.user, { displayName: user.name });
+        const cred = await createUserWithEmailAndPassword(auth, pendingUser.email, pendingUser.password);
+        await updateProfile(cred.user, { displayName: pendingUser.name });
 
-        user.uid = cred.user.uid;
-        await saveUserToDb(user);
+        const userData = { ...pendingUser };
+        delete userData.password;
+        userData.uid = cred.user.uid;
 
+        await saveUserToDb(userData);
         await sendEmailVerification(cred.user);
 
-        showAuthStatus("Account created successfully. Email verification sent.", true);
+        showVerificationStatus("Account created successfully. Email verification sent.", true);
 
-        $("s-code").value = "";
-        generateVerificationCode();
+        pendingUser = null;
+        verificationCode = "";
+        hideVerificationContainer();
 
         await signOut(auth);
         switchTab(0);
+        showAuthStatus("Account created. Please verify your email before logging in.", true);
       } catch (error) {
         console.error(error);
-        showAuthStatus(error.message || "Signup failed.", false);
+        showVerificationStatus(error.message || "Signup failed.", false);
       }
+    }
+
+    function cancelVerification() {
+      hideVerificationContainer();
+      switchTab(1);
     }
 
     async function doLogin() {
@@ -652,6 +695,8 @@
     window.switchTab = switchTab;
     window.togglePw = togglePw;
     window.doSignup = doSignup;
+    window.verifyCode = verifyCode;
+    window.cancelVerification = cancelVerification;
     window.doLogin = doLogin;
     window.doLogout = doLogout;
     window.addVideo = addVideo;
@@ -680,6 +725,7 @@
       } else {
         cu = null;
         $("profile-wrap").classList.add("hidden");
+        $("verification-wrap").classList.add("hidden");
         $("auth-wrap").classList.remove("hidden");
       }
     });
