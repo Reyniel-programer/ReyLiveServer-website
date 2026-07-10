@@ -404,9 +404,9 @@
     function renderProfile(user) {
       $("auth-wrap").classList.add("hidden");
       $("profile-wrap").classList.remove("hidden");
-      $("p-name").textContent = user.name || user.username || "User";
-      $("p-username-tag").textContent = user.username ? `@${user.username}` : "";
-      $("p-bio").textContent = user.bio || "No bio added";
+      $("p-name").textContent = user?.name || user?.username || "User";
+      $("p-username-tag").textContent = user?.username ? `@${user.username}` : "";
+      $("p-bio").textContent = user?.bio || "No bio added";
     }
 
     function renderVideos() {
@@ -524,6 +524,8 @@
           videos: [],
           createdAt: new Date().toISOString()
         };
+
+        if (!Array.isArray(cu.videos)) cu.videos = [];
 
         if (!profile) {
           await saveUserToDb(cu);
@@ -647,6 +649,8 @@
             videos: [],
             createdAt: new Date().toISOString()
           };
+
+          if (!Array.isArray(cu.videos)) cu.videos = [];
 
           if (!profile) {
             await saveUserToDb(cu);
