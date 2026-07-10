@@ -24,7 +24,7 @@
     }
 
     .tab-active {
-      border-bottom: 3px solid #f59e0b;
+      border-bottom: 3px solid #f59e0b !important;
       color: #f59e0b !important;
       font-weight: bold;
     }
@@ -109,6 +109,7 @@
       margin-top: 12px;
       font-size: 13px;
       max-width: 90%;
+      word-break: break-word;
     }
 
     .rel-pw {
@@ -347,15 +348,28 @@
     const storage = getStorage(app);
 
     let cu = null;
-
     const $ = (id) => document.getElementById(id);
 
+    function setStatus(elId, msg, ok) {
+      const el = $(elId);
+      el.innerHTML = "";
+      const div = document.createElement("div");
+      div.className = "status-bar";
+      div.style.background = ok ? "#14532d" : "#7f1d1d";
+      div.textContent = msg;
+      el.appendChild(div);
+    }
+
     function showAuthStatus(msg, ok) {
-      $("auth-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
+      setStatus("auth-status", msg, ok);
     }
 
     function showProfStatus(msg, ok) {
-      $("prof-status").innerHTML = `<div class="status-bar" style="background:${ok ? "#14532d" : "#7f1d1d"};">${msg}</div>`;
+      setStatus("prof-status", msg, ok);
+    }
+
+    function isPermissionError(error) {
+      return String(error?.code || "").includes("permission-denied");
     }
 
     async function saveUserToDb(userData) {
@@ -473,7 +487,11 @@
         switchTab(0);
       } catch (error) {
         console.error(error);
-        showAuthStatus(error.message || "Signup failed.", false);
+        if (isPermissionError(error)) {
+          showAuthStatus("Missing or insufficient permission. Check Firebase Firestore/Storage rules.", false);
+        } else {
+          showAuthStatus(error.message || "Signup failed.", false);
+        }
       }
     }
 
@@ -514,7 +532,11 @@
         renderVideos();
       } catch (error) {
         console.error(error);
-        showAuthStatus("Invalid email or password.", false);
+        if (isPermissionError(error)) {
+          showAuthStatus("Missing or insufficient permission. Check Firebase security rules.", false);
+        } else {
+          showAuthStatus("Invalid email or password.", false);
+        }
       }
     }
 
@@ -555,28 +577,43 @@
         e.target.value = "";
       } catch (error) {
         console.error(error);
-        showProfStatus("Failed to upload video. Check Firebase Storage rules.", false);
+        if (isPermissionError(error)) {
+          showProfStatus("Missing or insufficient permission. Update Firebase Storage rules.", false);
+        } else {
+          showProfStatus("Failed to upload video.", false);
+        }
       }
     }
 
     async function deleteVideo(index) {
-      if (!cu?.videos?.length) return;
+      if (!cu?.videos?.length || index < 0 || index >= cu.videos.length) return;
       if (!confirm("Delete this video?")) return;
 
       cu.videos.splice(index, 1);
-      await persistUser(cu);
-      showProfStatus("Video deleted.", true);
+      try {
+        await persistUser(cu);
+        showProfStatus("Video deleted.", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to delete video.", false);
+      }
     }
 
     async function renameVideo(index) {
-      if (!cu?.videos?.length) return;
+      if (!cu?.videos?.length || index < 0 || index >= cu.videos.length) return;
 
       const newTitle = prompt("New title:", cu.videos[index].title || "");
       if (newTitle === null) return;
 
       cu.videos[index].title = newTitle.trim() || "Untitled Video";
-      await persistUser(cu);
-      showProfStatus("Video renamed.", true);
+
+      try {
+        await persistUser(cu);
+        showProfStatus("Video renamed.", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to rename video.", false);
+      }
     }
 
     window.switchTab = switchTab;
@@ -590,29 +627,36 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const profile = await loadUserFromDb(user.uid);
+        try {
+          const profile = await loadUserFromDb(user.uid);
 
-        cu = profile || {
-          uid: user.uid,
-          email: user.email,
-          name: user.displayName || "User",
-          username: user.email?.split("@")[0] || "user",
-          phone: "",
-          age: "",
-          gender: "",
-          birthday: "",
-          address: "",
-          bio: "",
-          videos: [],
-          createdAt: new Date().toISOString()
-        };
+          cu = profile || {
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || "User",
+            username: user.email?.split("@")[0] || "user",
+            phone: "",
+            age: "",
+            gender: "",
+            birthday: "",
+            address: "",
+            bio: "",
+            videos: [],
+            createdAt: new Date().toISOString()
+          };
 
-        if (!profile) {
-          await saveUserToDb(cu);
+          if (!profile) {
+            await saveUserToDb(cu);
+          }
+
+          renderProfile(cu);
+          renderVideos();
+        } catch (error) {
+          console.error(error);
+          if (isPermissionError(error)) {
+            showAuthStatus("Missing or insufficient permission. Check Firestore rules.", false);
+          }
         }
-
-        renderProfile(cu);
-        renderVideos();
       } else {
         cu = null;
         $("profile-wrap").classList.add("hidden");
