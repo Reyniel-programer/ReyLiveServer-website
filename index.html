@@ -66,6 +66,7 @@
       align-items: center;
       gap: 7px;
       transition: opacity 0.15s;
+      justify-content: center;
     }
 
     .btn:hover {
@@ -145,7 +146,7 @@
 
     .video-player video {
       width: 100%;
-      height: 150px;
+      height: 180px;
       background: #000;
       object-fit: cover;
     }
@@ -163,6 +164,64 @@
       border-radius: 18px;
       padding: 20px;
       border: 1px solid #27272a;
+    }
+
+    .upload-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .upload-group .btn {
+      flex: 1 1 160px;
+    }
+
+    .profile-cover {
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .profile-cover .cover-actions {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .profile-header {
+      background: #18181b;
+      padding: 24px;
+      border-bottom: 1px solid #27272a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .profile-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+
+    .profile-photo {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #f59e0b;
+      background: #27272a;
     }
 
     @media (max-width: 700px) {
@@ -272,31 +331,42 @@
     </div>
 
     <div id="profile-wrap" class="hidden" style="background:#09090b;min-height:100vh;">
-      <div style="height:220px;overflow:hidden;position:relative;">
-        <div id="cover-bg" style="width:100%;height:100%;background:linear-gradient(135deg,#1d4ed8,#38bdf8);background-size:cover;background-position:center;"></div>
+      <div id="cover-bg" class="profile-cover">
+        <div class="cover-actions">
+          <button type="button" class="btn btn-orange" onclick="document.getElementById('cover-upload-input').click()">Change Cover</button>
+          <input type="file" id="cover-upload-input" accept="image/*" class="hidden" onchange="uploadCover(event)" />
+        </div>
       </div>
 
-      <div style="background:#18181b;padding:24px;border-bottom:1px solid #27272a;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-        <div>
-          <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
-          <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
+      <div class="profile-header">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <img id="p-photo" class="profile-photo" src="" alt="Profile photo" />
+          <div>
+            <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
+            <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
+          </div>
         </div>
+
         <button type="button" class="btn btn-ghost" onclick="doLogout()">Log Out</button>
       </div>
 
-      <div class="profile-body" style="max-width:900px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:280px 1fr;gap:20px;">
+      <div class="profile-body">
         <div class="section-box">
-          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Intro</h3>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile</h3>
           <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
+
+          <div class="upload-group">
+            <button type="button" class="btn btn-orange" onclick="document.getElementById('photo-upload-input').click()">Change Photo</button>
+            <input type="file" id="photo-upload-input" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
+
+            <button type="button" class="btn btn-gray" onclick="document.getElementById('video-upload-input').click()">+ Add Video</button>
+            <input type="file" id="video-upload-input" accept="video/*" class="hidden" onchange="addVideo(event)" />
+          </div>
         </div>
 
         <div class="section-box">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;">
             <h3 style="font-size:16px;font-weight:700;">My Videos</h3>
-            <button type="button" class="btn btn-orange" onclick="document.getElementById('video-upload-input').click()" style="padding:8px 16px;font-size:13px;">
-              + Add Video
-            </button>
-            <input type="file" id="video-upload-input" accept="video/*" class="hidden" onchange="addVideo(event)" />
           </div>
 
           <div id="video-grid" class="video-grid"></div>
@@ -399,9 +469,17 @@
     function renderProfile(user) {
       $("auth-wrap").classList.add("hidden");
       $("profile-wrap").classList.remove("hidden");
+
       $("p-name").textContent = user?.name || user?.username || "User";
       $("p-username-tag").textContent = user?.username ? `@${user.username}` : "";
       $("p-bio").textContent = user?.bio || "No bio added";
+      $("p-photo").src = user?.photoUrl || "https://via.placeholder.com/200?text=Photo";
+
+      if (user?.coverUrl) {
+        $("cover-bg").style.backgroundImage = `url('${user.coverUrl}')`;
+      } else {
+        $("cover-bg").style.backgroundImage = "linear-gradient(135deg,#1d4ed8,#38bdf8)";
+      }
     }
 
     function renderVideos() {
@@ -446,6 +524,7 @@
     }
 
     async function uploadMedia(file, folder) {
+      if (!cu?.uid) throw new Error("No logged in user");
       const safeName = file.name.replace(/[^\w.\-]+/g, "_");
       const fileRef = ref(storage, `${folder}/${cu.uid}/${Date.now()}-${safeName}`);
       await uploadBytes(fileRef, file);
@@ -466,6 +545,8 @@
         birthday: $("s-bday").value,
         address: $("s-addr").value.trim(),
         bio: $("s-bio").value.trim(),
+        photoUrl: "",
+        coverUrl: "",
         videos: [],
         createdAt: new Date().toISOString()
       };
@@ -519,6 +600,8 @@
           birthday: "",
           address: "",
           bio: "",
+          photoUrl: "",
+          coverUrl: "",
           videos: [],
           createdAt: new Date().toISOString()
         };
@@ -576,6 +659,38 @@
       }
     }
 
+    async function uploadPhoto(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        const url = await uploadMedia(file, "photos");
+        cu.photoUrl = url;
+        await persistUser(cu);
+        showProfStatus("Profile photo updated successfully!", true);
+        e.target.value = "";
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to upload photo.", false);
+      }
+    }
+
+    async function uploadCover(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        const url = await uploadMedia(file, "covers");
+        cu.coverUrl = url;
+        await persistUser(cu);
+        showProfStatus("Cover photo updated successfully!", true);
+        e.target.value = "";
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to upload cover photo.", false);
+      }
+    }
+
     async function deleteVideo(index) {
       if (!cu?.videos?.length || index < 0 || index >= cu.videos.length) return;
       if (!confirm("Delete this video?")) return;
@@ -613,6 +728,8 @@
     window.doLogin = doLogin;
     window.doLogout = doLogout;
     window.addVideo = addVideo;
+    window.uploadPhoto = uploadPhoto;
+    window.uploadCover = uploadCover;
     window.deleteVideo = deleteVideo;
     window.renameVideo = renameVideo;
 
@@ -632,6 +749,8 @@
             birthday: "",
             address: "",
             bio: "",
+            photoUrl: "",
+            coverUrl: "",
             videos: [],
             createdAt: new Date().toISOString()
           };
