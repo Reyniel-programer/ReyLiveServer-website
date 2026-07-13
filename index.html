@@ -73,6 +73,11 @@
       opacity: 0.85;
     }
 
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .btn-orange {
       background: #f59e0b;
       color: #000;
@@ -224,6 +229,11 @@
       background: #27272a;
     }
 
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
     @media (max-width: 700px) {
       .video-grid {
         grid-template-columns: 1fr;
@@ -233,11 +243,11 @@
         grid-template-columns: 1fr !important;
       }
 
-      #signup-form > div {
+      .signup-grid {
         grid-template-columns: 1fr !important;
       }
 
-      #signup-form [style*="grid-column:span 2"] {
+      .span-2 {
         grid-column: auto !important;
       }
     }
@@ -254,54 +264,54 @@
         </div>
 
         <div style="display:flex;border-bottom:1px solid #27272a;">
-          <button type="button" onclick="switchTab(0)" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;">Login</button>
-          <button type="button" onclick="switchTab(1)" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;">Sign Up</button>
+          <button type="button" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;">Login</button>
+          <button type="button" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;">Sign Up</button>
         </div>
 
         <div style="padding:28px;">
           <div id="login-form">
             <div style="display:flex;flex-direction:column;gap:14px;">
               <div>
-                <label>Email</label>
-                <input id="l-email" type="email" placeholder="Enter email" />
+                <label for="l-email">Email</label>
+                <input id="l-email" type="email" placeholder="Enter email" autocomplete="email" />
               </div>
 
               <div>
-                <label>Password</label>
+                <label for="l-pass">Password</label>
                 <div class="rel-pw">
-                  <input id="l-pass" type="password" placeholder="Enter password" />
-                  <button type="button" class="pw-eye" onclick="togglePw('l-pass','l-eye')" id="l-eye">👁</button>
+                  <input id="l-pass" type="password" placeholder="Enter password" autocomplete="current-password" />
+                  <button type="button" class="pw-eye" id="l-eye">👁</button>
                 </div>
               </div>
 
-              <button type="button" class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doLogin()">Sign In</button>
+              <button type="button" class="btn btn-orange" id="login-btn" style="width:100%;justify-content:center;">Sign In</button>
             </div>
 
             <p style="text-align:center;margin-top:16px;font-size:13px;color:#71717a;">
               Don't have an account?
-              <span onclick="switchTab(1)" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign up</span>
+              <span id="go-signup" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign up</span>
             </p>
           </div>
 
           <div id="signup-form" class="hidden">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div><label>Username</label><input id="s-user" placeholder="Choose username" /></div>
-              <div><label>Full Name</label><input id="s-name" placeholder="Your name" /></div>
-              <div><label>Email</label><input id="s-email" type="email" placeholder="you@email.com" /></div>
-              <div><label>Phone</label><input id="s-phone" type="tel" placeholder="+63 9XX XXX XXX" /></div>
+            <div class="signup-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><label for="s-user">Username</label><input id="s-user" placeholder="Choose username" /></div>
+              <div><label for="s-name">Full Name</label><input id="s-name" placeholder="Your name" /></div>
+              <div><label for="s-email">Email</label><input id="s-email" type="email" placeholder="you@email.com" autocomplete="email" /></div>
+              <div><label for="s-phone">Phone</label><input id="s-phone" type="tel" placeholder="+63 9XX XXX XXX" /></div>
 
               <div>
-                <label>Password</label>
+                <label for="s-pass">Password</label>
                 <div class="rel-pw">
-                  <input id="s-pass" type="password" placeholder="Min 6 chars" />
-                  <button type="button" class="pw-eye" onclick="togglePw('s-pass','s-eye')" id="s-eye">👁</button>
+                  <input id="s-pass" type="password" placeholder="Min 6 chars" autocomplete="new-password" />
+                  <button type="button" class="pw-eye" id="s-eye">👁</button>
                 </div>
               </div>
 
-              <div><label>Age</label><input id="s-age" type="number" placeholder="Age" /></div>
+              <div><label for="s-age">Age</label><input id="s-age" type="number" placeholder="Age" /></div>
 
               <div>
-                <label>Gender</label>
+                <label for="s-gender">Gender</label>
                 <select id="s-gender">
                   <option value="">Select</option>
                   <option>Male</option>
@@ -310,18 +320,18 @@
                 </select>
               </div>
 
-              <div><label>Birthday</label><input id="s-bday" type="date" /></div>
-              <div style="grid-column:span 2"><label>Address</label><input id="s-addr" placeholder="Your address" /></div>
-              <div style="grid-column:span 2"><label>Bio</label><textarea id="s-bio" rows="2" placeholder="Tell something about yourself"></textarea></div>
+              <div><label for="s-bday">Birthday</label><input id="s-bday" type="date" /></div>
+              <div class="span-2" style="grid-column:span 2"><label for="s-addr">Address</label><input id="s-addr" placeholder="Your address" /></div>
+              <div class="span-2" style="grid-column:span 2"><label for="s-bio">Bio</label><textarea id="s-bio" rows="2" placeholder="Tell something about yourself"></textarea></div>
 
-              <div style="grid-column:span 2">
-                <button type="button" class="btn btn-orange" style="width:100%;justify-content:center;" onclick="doSignup()">Create Account</button>
+              <div class="span-2" style="grid-column:span 2">
+                <button type="button" class="btn btn-orange" id="signup-btn" style="width:100%;justify-content:center;">Create Account</button>
               </div>
             </div>
 
             <p style="text-align:center;margin-top:14px;font-size:13px;color:#71717a;">
               Already have an account?
-              <span onclick="switchTab(0)" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign in</span>
+              <span id="go-login" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign in</span>
             </p>
           </div>
 
@@ -333,8 +343,8 @@
     <div id="profile-wrap" class="hidden" style="background:#09090b;min-height:100vh;">
       <div id="cover-bg" class="profile-cover">
         <div class="cover-actions">
-          <button type="button" class="btn btn-orange" onclick="document.getElementById('cover-upload-input').click()">Change Cover</button>
-          <input type="file" id="cover-upload-input" accept="image/*" class="hidden" onchange="uploadCover(event)" />
+          <button type="button" class="btn btn-orange" id="cover-btn">Change Cover</button>
+          <input type="file" id="cover-upload-input" accept="image/*" class="hidden" />
         </div>
       </div>
 
@@ -347,7 +357,7 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-ghost" onclick="doLogout()">Log Out</button>
+        <button type="button" class="btn btn-ghost" id="logout-btn">Log Out</button>
       </div>
 
       <div class="profile-body">
@@ -356,11 +366,11 @@
           <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
 
           <div class="upload-group">
-            <button type="button" class="btn btn-orange" onclick="document.getElementById('photo-upload-input').click()">Change Photo</button>
-            <input type="file" id="photo-upload-input" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
+            <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
+            <input type="file" id="photo-upload-input" accept="image/*" class="hidden" />
 
-            <button type="button" class="btn btn-gray" onclick="document.getElementById('video-upload-input').click()">+ Add Video</button>
-            <input type="file" id="video-upload-input" accept="video/*" class="hidden" onchange="addVideo(event)" />
+            <button type="button" class="btn btn-gray" id="video-btn">+ Add Video</button>
+            <input type="file" id="video-upload-input" accept="video/*" class="hidden" />
           </div>
         </div>
 
@@ -420,6 +430,11 @@
     let cu = null;
     const $ = (id) => document.getElementById(id);
 
+    const state = {
+      logging: false,
+      loadingProfile: false
+    };
+
     function setStatus(elId, msg, ok) {
       const el = $(elId);
       if (!el) return;
@@ -437,6 +452,25 @@
 
     function showProfStatus(msg, ok) {
       setStatus("prof-status", msg, ok);
+    }
+
+    function defaultUser(uid, email, displayName) {
+      return {
+        uid,
+        email,
+        name: displayName || "User",
+        username: email?.split("@")[0] || "user",
+        phone: "",
+        age: "",
+        gender: "",
+        birthday: "",
+        address: "",
+        bio: "",
+        photoUrl: "",
+        coverUrl: "",
+        videos: [],
+        createdAt: new Date().toISOString()
+      };
     }
 
     async function saveUserToDb(userData) {
@@ -464,6 +498,13 @@
       const btn = $(btnId);
       input.type = input.type === "password" ? "text" : "password";
       btn.textContent = input.type === "password" ? "👁" : "🙈";
+    }
+
+    function setLoading(buttonId, isLoading, text) {
+      const btn = $(buttonId);
+      if (!btn) return;
+      btn.disabled = isLoading;
+      btn.textContent = text;
     }
 
     function renderProfile(user) {
@@ -507,8 +548,8 @@
             <div style="font-size:14px;font-weight:600;word-break:break-word;">${video?.title || "Untitled Video"}</div>
             <div style="font-size:12px;color:#71717a;">${video?.addedAt ? new Date(video.addedAt).toLocaleDateString() : ""}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button type="button" onclick="deleteVideo(${index})" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
-              <button type="button" onclick="renameVideo(${index})" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
+              <button type="button" data-action="delete-video" data-index="${index}" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
+              <button type="button" data-action="rename-video" data-index="${index}" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
             </div>
           </div>
         `;
@@ -532,6 +573,8 @@
     }
 
     async function doSignup() {
+      if (state.logging) return;
+
       const email = $("s-email").value.trim();
       const password = $("s-pass").value.trim();
 
@@ -562,21 +605,26 @@
       }
 
       try {
+        state.logging = true;
+        setLoading("signup-btn", true, "Creating account...");
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: user.name });
-
         user.uid = cred.user.uid;
         await saveUserToDb(user);
-
         showAuthStatus("Account created successfully. You can now log in.", true);
         switchTab(0);
       } catch (error) {
         console.error(error);
         showAuthStatus(error.message || "Signup failed.", false);
+      } finally {
+        state.logging = false;
+        setLoading("signup-btn", false, "Create Account");
       }
     }
 
     async function doLogin() {
+      if (state.logging) return;
+
       const email = $("l-email").value.trim();
       const password = $("l-pass").value.trim();
 
@@ -586,31 +634,15 @@
       }
 
       try {
+        state.logging = true;
+        setLoading("login-btn", true, "Signing in...");
         const cred = await signInWithEmailAndPassword(auth, email, password);
-        const profile = await loadUserFromDb(cred.user.uid);
 
-        cu = profile || {
-          uid: cred.user.uid,
-          email: cred.user.email,
-          name: cred.user.displayName || "User",
-          username: cred.user.email?.split("@")[0] || "user",
-          phone: "",
-          age: "",
-          gender: "",
-          birthday: "",
-          address: "",
-          bio: "",
-          photoUrl: "",
-          coverUrl: "",
-          videos: [],
-          createdAt: new Date().toISOString()
-        };
+        const profile = await loadUserFromDb(cred.user.uid);
+        cu = profile || defaultUser(cred.user.uid, cred.user.email, cred.user.displayName);
 
         if (!Array.isArray(cu.videos)) cu.videos = [];
-
-        if (!profile) {
-          await saveUserToDb(cu);
-        }
+        if (!profile) await saveUserToDb(cu);
 
         showAuthStatus("Login successful!", true);
         renderProfile(cu);
@@ -618,6 +650,9 @@
       } catch (error) {
         console.error(error);
         showAuthStatus("Invalid email or password.", false);
+      } finally {
+        state.logging = false;
+        setLoading("login-btn", false, "Sign In");
       }
     }
 
@@ -640,6 +675,7 @@
       if (!file || !cu) return;
 
       try {
+        showProfStatus("Uploading video...", true);
         const url = await uploadMedia(file, "videos");
         const videoData = {
           url,
@@ -664,6 +700,7 @@
       if (!file || !cu) return;
 
       try {
+        showProfStatus("Uploading photo...", true);
         const url = await uploadMedia(file, "photos");
         cu.photoUrl = url;
         await persistUser(cu);
@@ -680,6 +717,7 @@
       if (!file || !cu) return;
 
       try {
+        showProfStatus("Uploading cover...", true);
         const url = await uploadMedia(file, "covers");
         cu.coverUrl = url;
         await persistUser(cu);
@@ -722,50 +760,49 @@
       }
     }
 
-    window.switchTab = switchTab;
-    window.togglePw = togglePw;
-    window.doSignup = doSignup;
-    window.doLogin = doLogin;
-    window.doLogout = doLogout;
-    window.addVideo = addVideo;
-    window.uploadPhoto = uploadPhoto;
-    window.uploadCover = uploadCover;
-    window.deleteVideo = deleteVideo;
-    window.renameVideo = renameVideo;
+    $("tab-login").addEventListener("click", () => switchTab(0));
+    $("tab-signup").addEventListener("click", () => switchTab(1));
+    $("go-login").addEventListener("click", () => switchTab(0));
+    $("go-signup").addEventListener("click", () => switchTab(1));
+    $("l-eye").addEventListener("click", () => togglePw("l-pass", "l-eye"));
+    $("s-eye").addEventListener("click", () => togglePw("s-pass", "s-eye"));
+    $("login-btn").addEventListener("click", doLogin);
+    $("signup-btn").addEventListener("click", doSignup);
+    $("logout-btn").addEventListener("click", doLogout);
+    $("photo-btn").addEventListener("click", () => $("photo-upload-input").click());
+    $("video-btn").addEventListener("click", () => $("video-upload-input").click());
+    $("cover-btn").addEventListener("click", () => $("cover-upload-input").click());
+
+    $("photo-upload-input").addEventListener("change", uploadPhoto);
+    $("video-upload-input").addEventListener("change", addVideo);
+    $("cover-upload-input").addEventListener("change", uploadCover);
+
+    $("video-grid").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const index = Number(btn.dataset.index);
+      const action = btn.dataset.action;
+      if (action === "delete-video") deleteVideo(index);
+      if (action === "rename-video") renameVideo(index);
+    });
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
+          state.loadingProfile = true;
           const profile = await loadUserFromDb(user.uid);
-
-          cu = profile || {
-            uid: user.uid,
-            email: user.email,
-            name: user.displayName || "User",
-            username: user.email?.split("@")[0] || "user",
-            phone: "",
-            age: "",
-            gender: "",
-            birthday: "",
-            address: "",
-            bio: "",
-            photoUrl: "",
-            coverUrl: "",
-            videos: [],
-            createdAt: new Date().toISOString()
-          };
+          cu = profile || defaultUser(user.uid, user.email, user.displayName);
 
           if (!Array.isArray(cu.videos)) cu.videos = [];
-
-          if (!profile) {
-            await saveUserToDb(cu);
-          }
+          if (!profile) await saveUserToDb(cu);
 
           renderProfile(cu);
           renderVideos();
         } catch (error) {
           console.error(error);
           showAuthStatus("Failed to load profile.", false);
+        } finally {
+          state.loadingProfile = false;
         }
       } else {
         cu = null;
@@ -774,9 +811,9 @@
       }
     });
 
-    window.onload = () => {
+    window.addEventListener("DOMContentLoaded", () => {
       switchTab(0);
-    };
+    });
   </script>
 </body>
 </html>
