@@ -424,7 +424,6 @@
 
     let cu = null;
     const $ = (id) => document.getElementById(id);
-
     const state = { logging: false };
 
     function setStatus(elId, msg, ok) {
@@ -483,12 +482,14 @@
     function togglePw(inputId, btnId) {
       const input = $(inputId);
       const btn = $(btnId);
+      if (!input || !btn) return;
       input.type = input.type === "password" ? "text" : "password";
       btn.textContent = input.type === "password" ? "👁" : "🙈";
     }
 
     function setLoading(buttonId, isLoading, text) {
       const btn = $(buttonId);
+      if (!btn) return;
       btn.disabled = isLoading;
       btn.textContent = text;
     }
@@ -521,9 +522,11 @@
     function renderVideos() {
       const container = $("video-grid");
       const noVideos = $("no-videos");
-      container.innerHTML = "";
+      if (!container || !noVideos) return;
 
+      container.innerHTML = "";
       const videos = Array.isArray(cu?.videos) ? cu.videos : [];
+
       if (!videos.length) {
         noVideos.style.display = "block";
         return;
@@ -810,11 +813,7 @@
       }
     });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      switchTab(0);
-    });
+    switchTab(0);
   </script>
 </body>
 </html>
-
-
