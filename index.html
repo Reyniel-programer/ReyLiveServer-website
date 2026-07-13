@@ -461,7 +461,8 @@
 
     async function saveUserToDb(userData) {
       if (!userData?.uid) throw new Error("Missing user UID");
-      await setDoc(doc(db, "users", userData.uid), userData, { merge: true });
+      const userRef = doc(db, "users", userData.uid);
+      await setDoc(userRef, userData, { merge: true });
     }
 
     async function loadUserFromDb(uid) {
@@ -501,6 +502,8 @@
         ...(profile || {}),
         uid: user.uid,
         email: user.email || profile?.email || "",
+        name: profile?.name || user.displayName || base.name,
+        username: profile?.username || base.username,
         videos: Array.isArray(profile?.videos) ? profile.videos : []
       };
     }
@@ -612,11 +615,14 @@
         state.logging = true;
         setLoading("signup-btn", true, "Creating account...");
         const cred = await createUserWithEmailAndPassword(auth, email, password);
+
         await updateProfile(cred.user, { displayName: user.name });
+
         user.uid = cred.user.uid;
         await saveUserToDb(user);
-        showAuthStatus("Account created successfully. You can now log in.", true);
-        switchTab(0);
+
+        showAuthStatus("Account created successfully. Logging you in...", true);
+        await signInWithEmailAndPassword(auth, email, password);
       } catch (error) {
         console.error(error);
         showAuthStatus(error.message || "Signup failed.", false);
@@ -640,12 +646,13 @@
       try {
         state.logging = true;
         setLoading("login-btn", true, "Signing in...");
-        const cred = await signInWithEmailAndPassword(auth, email, password);
 
+        const cred = await signInWithEmailAndPassword(auth, email, password);
         const profile = await loadUserFromDb(cred.user.uid);
         cu = normalizeUserData(profile, cred.user);
 
-        if (!profile) await saveUserToDb(cu);
+        // Ensure Firestore always has the complete user document
+        await saveUserToDb(cu);
 
         showAuthStatus("Login successful!", true);
         renderProfile(cu);
@@ -798,7 +805,8 @@
           const profile = await loadUserFromDb(user.uid);
           cu = normalizeUserData(profile, user);
 
-          if (!profile) await saveUserToDb(cu);
+          // Keep DB synced with auth user
+          await saveUserToDb(cu);
 
           renderProfile(cu);
           renderVideos();
