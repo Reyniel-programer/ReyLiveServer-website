@@ -475,7 +475,8 @@
 
     async function saveUserToDb(userData) {
       if (!userData?.uid) throw new Error("Missing user UID");
-      await setDoc(doc(db, "users", userData.uid), userData, { merge: true });
+      const userRef = doc(db, "users", userData.uid);
+      await setDoc(userRef, userData, { merge: true });
     }
 
     async function loadUserFromDb(uid) {
@@ -486,10 +487,12 @@
     function switchTab(t) {
       $("login-form").classList.toggle("hidden", t !== 0);
       $("signup-form").classList.toggle("hidden", t !== 1);
-      $("tab-login").className = t === 0 ? "tab-active" : "";
-      $("tab-signup").className = t === 1 ? "tab-active" : "";
-      $("tab-login").style.color = t === 0 ? "" : "#71717a";
-      $("tab-signup").style.color = t === 1 ? "" : "#71717a";
+
+      $("tab-login").classList.toggle("tab-active", t === 0);
+      $("tab-signup").classList.toggle("tab-active", t === 1);
+
+      $("tab-login").style.color = t === 0 ? "#f59e0b" : "#71717a";
+      $("tab-signup").style.color = t === 1 ? "#f59e0b" : "#71717a";
       $("auth-status").innerHTML = "";
     }
 
