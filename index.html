@@ -227,6 +227,7 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+      cursor: pointer;
     }
 
     .profile-cover::after {
@@ -663,7 +664,7 @@
 
     async function saveUserToDb(userData) {
       if (!userData?.uid) throw new Error("Missing user UID");
-      await setDoc(doc(db, "users", userData.uid), userData, { merge: true });
+      await setDoc(doc(db, "users", userData.uid), userData);
     }
 
     async function loadUserFromDb(uid) {
@@ -1116,14 +1117,6 @@
         cu.posts.splice(index, 1);
         await persistUser(cu);
         showProfStatus("Post deleted.", true);
-      }
-
-      if (action === "edit") {
-        const newText = prompt("Edit post:", cu.posts[index].text || "");
-        if (newText === null) return;
-        cu.posts[index].text = newText.trim() || cu.posts[index].text;
-        await persistUser(cu);
-        showProfStatus("Post updated.", true);
       }
 
       if (action === "like") {
