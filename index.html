@@ -171,12 +171,6 @@
       border: 1px solid #3f3f46;
       display: flex;
       flex-direction: column;
-      transition: .3s;
-    }
-
-    .video-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(245, 158, 11, .3);
     }
 
     body.light-mode .video-card {
@@ -207,12 +201,6 @@
       border-radius: 18px;
       padding: 20px;
       border: 1px solid #27272a;
-      transition: .3s;
-    }
-
-    .section-box:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
     }
 
     body.light-mode .section-box {
@@ -239,12 +227,6 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      cursor: pointer;
-      transition: .4s;
-    }
-
-    .profile-cover:hover {
-      filter: brightness(1.08);
     }
 
     .profile-cover::after {
@@ -298,12 +280,6 @@
       border: 4px solid #f59e0b;
       background: #27272a;
       cursor: pointer;
-      transition: .3s;
-    }
-
-    .profile-photo:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 25px #f59e0b;
     }
 
     .clickable-photo {
@@ -330,12 +306,6 @@
       border-radius: 14px;
       padding: 16px;
       margin-top: 12px;
-      transition: .3s;
-    }
-
-    .post-card:hover {
-      transform: translateY(-4px);
-      border-color: #f59e0b;
     }
 
     body.light-mode .post-card {
@@ -378,10 +348,9 @@
       background: #0f172a;
       border: 1px solid #f59e0b33;
       border-radius: 14px;
-      padding: 18px;
+      padding: 14px;
       color: #e2e8f0;
-      line-height: 2;
-      font-size: 17px;
+      line-height: 1.8;
     }
 
     body.light-mode .user-info-box {
@@ -392,89 +361,6 @@
 
     .user-info-box strong {
       color: #f59e0b;
-      font-size: 17px;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 10000;
-    }
-
-    .modal-content {
-      width: 100%;
-      max-width: 360px;
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    }
-
-    body.light-mode .modal-content {
-      background: #ffffff;
-      border-color: #e5e7eb;
-    }
-
-    .calc-display {
-      width: 100%;
-      font-size: 28px;
-      font-weight: bold;
-      text-align: right;
-      padding: 14px;
-      margin-bottom: 14px;
-      border-radius: 12px;
-      background: #0f172a;
-      color: #fff;
-      overflow-x: auto;
-    }
-
-    body.light-mode .calc-display {
-      background: #f3f4f6;
-      color: #111827;
-    }
-
-    .calc-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .calc-grid button {
-      padding: 14px;
-      font-size: 18px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      background: #3f3f46;
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .calc-grid button:hover {
-      opacity: 0.88;
-    }
-
-    .calc-grid .calc-orange {
-      background: #f59e0b;
-      color: #000;
-    }
-
-    .calc-grid .calc-red {
-      background: #ef4444;
-    }
-
-    .calc-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      gap: 10px;
     }
 
     @media (max-width: 700px) {
@@ -498,9 +384,8 @@
 </head>
 <body>
   <div id="app">
-    <div style="position:fixed;top:16px;right:16px;z-index:99999;display:flex;gap:10px;flex-wrap:wrap;">
+    <div style="position:fixed;top:16px;right:16px;z-index:99999;">
       <button id="theme-toggle" class="btn btn-ghost">Toggle White/Black</button>
-      <button id="open-calculator-btn" class="btn btn-orange">Open Calculator</button>
     </div>
 
     <div id="auth-wrap" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f172a,#18181b)">
@@ -607,7 +492,6 @@
         </div>
 
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button type="button" class="btn btn-orange" id="open-calculator-btn-profile">Calculator</button>
           <button type="button" class="btn btn-gray" id="edit-profile-btn">Edit Profile</button>
           <button type="button" class="btn btn-ghost" id="logout-btn">Log Out</button>
         </div>
@@ -616,7 +500,7 @@
       <div class="profile-body">
         <div class="section-box">
           <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile</h3>
-          <p id="p-bio" style="color:#a1a1aa;font-size:14px;font-style:italic;margin-bottom:14px;">No bio added</p>
+          <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
 
           <div class="upload-group">
             <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
@@ -690,42 +574,6 @@
         </div>
       </div>
     </div>
-
-    <div id="calculator-modal" class="modal hidden">
-      <div class="modal-content">
-        <div class="calc-top">
-          <h3 style="font-size:18px;">Calculator</h3>
-          <button id="close-calculator-btn" class="btn btn-red" style="padding:8px 12px;">Close</button>
-        </div>
-
-        <div id="calc-display" class="calc-display">0</div>
-
-        <div class="calc-grid">
-          <button data-calc="C" class="calc-red">C</button>
-          <button data-calc="⌫">⌫</button>
-          <button data-calc="/">÷</button>
-          <button data-calc="*">×</button>
-
-          <button data-calc="7">7</button>
-          <button data-calc="8">8</button>
-          <button data-calc="9">9</button>
-          <button data-calc="-">−</button>
-
-          <button data-calc="4">4</button>
-          <button data-calc="5">5</button>
-          <button data-calc="6">6</button>
-          <button data-calc="+">+</button>
-
-          <button data-calc="1">1</button>
-          <button data-calc="2">2</button>
-          <button data-calc="3">3</button>
-          <button data-calc="=" class="calc-orange">=</button>
-
-          <button data-calc="0" style="grid-column: span 2;">0</button>
-          <button data-calc=".">.</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script type="module">
@@ -767,7 +615,7 @@
 
     let cu = null;
     const $ = (id) => document.getElementById(id);
-    const state = { calcValue: "0" };
+    const state = { logging: false };
 
     const PROFILE_PLACEHOLDER =
       "data:image/svg+xml;charset=UTF-8," +
@@ -833,11 +681,19 @@
       $("auth-status").innerHTML = "";
     }
 
-    function setLoading(buttonId, isLoading, text, originalText) {
+    function togglePw(inputId, btnId) {
+      const input = $(inputId);
+      const btn = $(btnId);
+      if (!input || !btn) return;
+      input.type = input.type === "password" ? "text" : "password";
+      btn.textContent = input.type === "password" ? "👁" : "🙈";
+    }
+
+    function setLoading(buttonId, isLoading, text) {
       const btn = $(buttonId);
       if (!btn) return;
       btn.disabled = isLoading;
-      btn.textContent = isLoading ? text : originalText;
+      btn.textContent = text;
     }
 
     function normalizeUserData(profile, user) {
@@ -866,9 +722,9 @@
       $("photo-link").href = user?.photoUrl || PROFILE_PLACEHOLDER;
 
       const cover = $("cover-bg");
-      cover.style.backgroundImage = user?.coverUrl ? `url("${user.coverUrl}")` : "none";
-      cover.style.backgroundColor = user?.coverUrl ? "transparent" : "";
-      cover.style.background = user?.coverUrl ? `url("${user.coverUrl}") center/cover no-repeat` : "linear-gradient(135deg,#1d4ed8,#38bdf8)";
+      cover.style.backgroundImage = user?.coverUrl
+        ? `url("${user.coverUrl}")`
+        : "linear-gradient(135deg,#1d4ed8,#38bdf8)";
 
       $("user-info").innerHTML = `
         <div><strong>Email:</strong> ${user.email || "N/A"}</div>
@@ -940,8 +796,9 @@
         const div = document.createElement("div");
         div.className = "post-card";
         div.innerHTML = `
-          <div class="post-text"></div>
+          <div class="post-text">${post.text || ""}</div>
           <div class="post-meta">${post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}</div>
+
           <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
             <button type="button" class="btn btn-green" data-post-action="like" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
               Like (${likes})
@@ -953,6 +810,7 @@
               Delete
             </button>
           </div>
+
           ${comments.length ? `
             <div class="post-comments">
               <strong style="color:#f59e0b;">Comments:</strong>
@@ -962,7 +820,6 @@
             </div>
           ` : ""}
         `;
-        div.querySelector(".post-text").textContent = post.text || "";
         list.appendChild(div);
       });
     }
@@ -993,192 +850,311 @@
     }
 
     async function doSignup() {
+      if (state.logging) return;
+
       const email = $("s-email").value.trim();
       const password = $("s-pass").value.trim();
-      const username = $("s-user").value.trim();
-      const name = $("s-name").value.trim();
 
-      if (!email || !password || !username || !name) return showAuthStatus("Please fill in required fields.", false);
-      if (password.length < 6) return showAuthStatus("Password must be at least 6 characters.", false);
+      const user = {
+        username: $("s-user").value.trim(),
+        name: $("s-name").value.trim(),
+        email,
+        phone: $("s-phone").value.trim(),
+        age: $("s-age").value.trim(),
+        gender: $("s-gender").value,
+        birthday: $("s-bday").value,
+        address: $("s-addr").value.trim(),
+        bio: $("s-bio").value.trim(),
+        photoUrl: "",
+        coverUrl: "",
+        videos: [],
+        posts: [],
+        createdAt: new Date().toISOString()
+      };
+
+      if (!user.username || !user.name || !email || !password) {
+        showAuthStatus("Please fill in all required fields.", false);
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthStatus("Password must be at least 6 characters.", false);
+        return;
+      }
 
       try {
-        setLoading("signup-btn", true, "Creating...", "Create Account");
+        state.logging = true;
+        setLoading("signup-btn", true, "Creating account...");
+
         const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(cred.user, { displayName: name });
+        await updateProfile(cred.user, { displayName: user.name });
 
-        const userData = defaultUser(cred.user.uid, email, name);
-        userData.username = username;
-        userData.phone = $("s-phone").value.trim();
-        userData.age = $("s-age").value.trim();
-        userData.gender = $("s-gender").value;
-        userData.birthday = $("s-bday").value;
-        userData.address = $("s-addr").value.trim();
-        userData.bio = $("s-bio").value.trim();
+        user.uid = cred.user.uid;
+        await saveUserToDb(user);
 
-        await persistUser(userData);
         showAuthStatus("Account created successfully.", true);
-      } catch (err) {
-        showAuthStatus(err.message, false);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus(error.message || "Signup failed.", false);
       } finally {
-        setLoading("signup-btn", false, "Creating...", "Create Account");
+        state.logging = false;
+        setLoading("signup-btn", false, "Create Account");
       }
     }
 
     async function doLogin() {
+      if (state.logging) return;
+
       const email = $("l-email").value.trim();
       const password = $("l-pass").value.trim();
-      if (!email || !password) return showAuthStatus("Enter email and password.", false);
+
+      if (!email || !password) {
+        showAuthStatus("Please enter your email and password.", false);
+        return;
+      }
 
       try {
-        setLoading("login-btn", true, "Signing In...", "Sign In");
-        await signInWithEmailAndPassword(auth, email, password);
-        showAuthStatus("Login successful.", true);
-      } catch (err) {
-        showAuthStatus(err.message, false);
+        state.logging = true;
+        setLoading("login-btn", true, "Signing in...");
+
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const profile = await loadUserFromDb(cred.user.uid);
+        cu = normalizeUserData(profile, cred.user);
+
+        await saveUserToDb(cu);
+
+        showAuthStatus("Login successful!", true);
+        renderProfile(cu);
+        renderVideos();
+        renderPosts();
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Invalid email or password.", false);
       } finally {
-        setLoading("login-btn", false, "Signing In...", "Sign In");
+        state.logging = false;
+        setLoading("login-btn", false, "Sign In");
       }
     }
 
     async function doLogout() {
-      await signOut(auth);
-      cu = null;
-      $("profile-wrap").classList.add("hidden");
-      $("auth-wrap").classList.remove("hidden");
+      try {
+        await signOut(auth);
+        cu = null;
+        $("profile-wrap").classList.add("hidden");
+        $("auth-wrap").classList.remove("hidden");
+        $("prof-status").innerHTML = "";
+        showAuthStatus("Logged out successfully.", true);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Logout failed.", false);
+      }
     }
 
     async function addVideoLink() {
       const url = $("video-link").value.trim();
-      if (!url) return showProfStatus("Paste a video URL first.", false);
-
-      let video = { title: "Video Link", addedAt: new Date().toISOString() };
-      if (url.includes("youtube.com") || url.includes("youtu.be")) {
-        const id = url.includes("youtu.be")
-          ? url.split("/").pop().split("?")[0]
-          : new URL(url).searchParams.get("v");
-        if (!id) return showProfStatus("Invalid YouTube URL.", false);
-        video.type = "youtube";
-        video.embedUrl = `https://www.youtube.com/embed/${id}`;
-      } else {
-        video.type = "direct";
-        video.url = url;
+      if (!url || !cu) {
+        showProfStatus("Please paste a valid video URL.", false);
+        return;
       }
 
-      cu.videos = [...(cu.videos || []), video];
-      await persistUser(cu);
-      $("video-link").value = "";
-      showProfStatus("Video added.", true);
-    }
+      let videoData = {
+        title: "Video Link",
+        addedAt: new Date().toISOString(),
+        url,
+        type: "link"
+      };
 
-    async function uploadPhoto() {
-      $("photo-upload-input").click();
-    }
+      const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+      if (yt) {
+        const videoId = yt[1];
+        videoData = {
+          title: "YouTube Video",
+          addedAt: new Date().toISOString(),
+          type: "youtube",
+          url,
+          embedUrl: `https://www.youtube.com/embed/${videoId}`
+        };
+      }
 
-    async function uploadCover() {
-      $("cover-upload-input").click();
-    }
+      cu.videos = Array.isArray(cu.videos) ? cu.videos : [];
+      cu.videos.push(videoData);
 
-    async function uploadVideoFile() {
-      $("video-upload-input").click();
-    }
-
-    async function handlePhotoFile(e) {
-      const file = e.target.files?.[0];
-      if (!file) return;
       try {
+        await persistUser(cu);
+        showProfStatus("Video link saved successfully!", true);
+        $("video-link").value = "";
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to save video link.", false);
+      }
+    }
+
+    async function uploadPhoto(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        showProfStatus("Uploading photo...", true);
         const url = await uploadMedia(file, "photos");
         cu.photoUrl = url;
         await persistUser(cu);
-        showProfStatus("Photo updated.", true);
-      } catch (err) {
-        showProfStatus(err.message, false);
+        showProfStatus("Profile photo updated successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to upload photo.", false);
       } finally {
         e.target.value = "";
       }
     }
 
-    async function handleCoverFile(e) {
+    async function uploadCover(e) {
       const file = e.target.files?.[0];
-      if (!file) return;
+      if (!file || !cu) return;
+
       try {
+        showProfStatus("Uploading cover...", true);
         const url = await uploadMedia(file, "covers");
         cu.coverUrl = url;
         await persistUser(cu);
-        showProfStatus("Cover updated.", true);
-      } catch (err) {
-        showProfStatus(err.message, false);
+        showProfStatus("Cover photo updated successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to upload cover photo.", false);
       } finally {
         e.target.value = "";
       }
     }
 
-    async function handleVideoFile(e) {
+    async function uploadVideoFile(e) {
       const file = e.target.files?.[0];
-      if (!file) return;
+      if (!file || !cu) return;
+
       try {
+        showProfStatus("Uploading video...", true);
         const url = await uploadMedia(file, "videos");
-        cu.videos = [...(cu.videos || []), { type: "file", url, title: file.name, addedAt: new Date().toISOString() }];
+
+        cu.videos = Array.isArray(cu.videos) ? cu.videos : [];
+        cu.videos.push({
+          title: file.name.replace(/\.[^/.]+$/, ""),
+          addedAt: new Date().toISOString(),
+          url,
+          type: "storage"
+        });
+
         await persistUser(cu);
-        showProfStatus("Video uploaded.", true);
-      } catch (err) {
-        showProfStatus(err.message, false);
+        showProfStatus("Video uploaded successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to upload video.", false);
       } finally {
         e.target.value = "";
       }
     }
 
     async function deleteVideo(index) {
+      if (!cu?.videos?.length || index < 0 || index >= cu.videos.length) return;
+      if (!confirm("Delete this video?")) return;
+
       cu.videos.splice(index, 1);
-      await persistUser(cu);
-      showProfStatus("Video deleted.", true);
+
+      try {
+        await persistUser(cu);
+        showProfStatus("Video deleted.", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to delete video.", false);
+      }
     }
 
     async function renameVideo(index) {
-      const current = cu.videos[index]?.title || "";
-      const next = prompt("Enter new video title:", current);
-      if (!next) return;
-      cu.videos[index].title = next.trim();
-      await persistUser(cu);
-      showProfStatus("Video renamed.", true);
+      if (!cu?.videos?.length || index < 0 || index >= cu.videos.length) return;
+
+      const newTitle = prompt("New title:", cu.videos[index].title || "");
+      if (newTitle === null) return;
+
+      cu.videos[index].title = newTitle.trim() || "Untitled Video";
+
+      try {
+        await persistUser(cu);
+        showProfStatus("Video renamed.", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to rename video.", false);
+      }
     }
 
     async function addPost() {
       const text = $("post-text").value.trim();
-      if (!text) return showProfStatus("Write something before posting.", false);
+      if (!text || !cu) {
+        showProfStatus("Write something before posting.", false);
+        return;
+      }
 
-      cu.posts = [...(cu.posts || []), { text, likes: 0, comments: [], createdAt: new Date().toISOString() }];
+      cu.posts = Array.isArray(cu.posts) ? cu.posts : [];
+      cu.posts.push({
+        text,
+        createdAt: new Date().toISOString(),
+        likes: 0,
+        comments: []
+      });
+
       await persistUser(cu);
       $("post-text").value = "";
-      showProfStatus("Post added.", true);
+      showProfStatus("Post added successfully.", true);
     }
 
     async function handlePostActions(e) {
       const btn = e.target.closest("button[data-post-action]");
-      if (!btn) return;
+      if (!btn || !cu) return;
+
       const index = Number(btn.dataset.index);
       const action = btn.dataset.postAction;
-      const post = cu.posts[index];
-      if (!post) return;
 
-      if (action === "like") post.likes = (post.likes || 0) + 1;
-      if (action === "comment") {
-        const comment = prompt("Add a comment:");
-        if (comment?.trim()) post.comments = [...(post.comments || []), comment.trim()];
+      if (!Array.isArray(cu.posts) || index < 0 || index >= cu.posts.length) return;
+
+      if (action === "delete") {
+        cu.posts.splice(index, 1);
+        await persistUser(cu);
+        showProfStatus("Post deleted.", true);
       }
-      if (action === "delete") cu.posts.splice(index, 1);
 
-      await persistUser(cu);
+      if (action === "edit") {
+        const newText = prompt("Edit post:", cu.posts[index].text || "");
+        if (newText === null) return;
+        cu.posts[index].text = newText.trim() || cu.posts[index].text;
+        await persistUser(cu);
+        showProfStatus("Post updated.", true);
+      }
+
+      if (action === "like") {
+        cu.posts[index].likes = (cu.posts[index].likes || 0) + 1;
+        await persistUser(cu);
+        showProfStatus("Post liked.", true);
+      }
+
+      if (action === "comment") {
+        const comment = prompt("Write a comment:");
+        if (comment === null) return;
+        const c = comment.trim();
+        if (!c) return;
+
+        cu.posts[index].comments = Array.isArray(cu.posts[index].comments) ? cu.posts[index].comments : [];
+        cu.posts[index].comments.push(c);
+        await persistUser(cu);
+        showProfStatus("Comment added.", true);
+      }
     }
 
     function openEditModal() {
-      $("edit-name").value = cu?.name || "";
-      $("edit-username").value = cu?.username || "";
-      $("edit-phone").value = cu?.phone || "";
-      $("edit-age").value = cu?.age || "";
-      $("edit-gender").value = cu?.gender || "";
-      $("edit-birthday").value = cu?.birthday || "";
-      $("edit-address").value = cu?.address || "";
-      $("edit-bio").value = cu?.bio || "";
+      if (!cu) return;
+      $("edit-name").value = cu.name || "";
+      $("edit-username").value = cu.username || "";
+      $("edit-phone").value = cu.phone || "";
+      $("edit-age").value = cu.age || "";
+      $("edit-gender").value = cu.gender || "";
+      $("edit-birthday").value = cu.birthday || "";
+      $("edit-address").value = cu.address || "";
+      $("edit-bio").value = cu.bio || "";
       $("edit-modal").classList.remove("hidden");
     }
 
@@ -1187,6 +1163,8 @@
     }
 
     async function saveEditProfile() {
+      if (!cu) return;
+
       cu.name = $("edit-name").value.trim();
       cu.username = $("edit-username").value.trim();
       cu.phone = $("edit-phone").value.trim();
@@ -1195,129 +1173,83 @@
       cu.birthday = $("edit-birthday").value;
       cu.address = $("edit-address").value.trim();
       cu.bio = $("edit-bio").value.trim();
+
       await persistUser(cu);
       closeEditModal();
-      showProfStatus("Profile updated.", true);
+      showProfStatus("Profile updated successfully.", true);
     }
 
     function setUrl(type) {
-      const url = prompt(`Enter ${type} URL:`);
+      if (!cu) return;
+      const url = prompt(`Enter ${type} URL:`, type === "photo" ? cu.photoUrl || "" : cu.coverUrl || "");
       if (!url) return;
+
       if (type === "photo") cu.photoUrl = url.trim();
       if (type === "cover") cu.coverUrl = url.trim();
-      persistUser(cu).then(() => showProfStatus(`${type} URL updated.`, true));
+
+      persistUser(cu);
     }
 
-    function openCalculator() {
-      $("calculator-modal").classList.remove("hidden");
-    }
-
-    function closeCalculator() {
-      $("calculator-modal").classList.add("hidden");
-    }
-
-    function updateCalculatorDisplay() {
-      $("calc-display").textContent = state.calcValue;
-    }
-
-    function calculateExpression(expr) {
-      try {
-        if (!/^[0-9+\-*/.() ]+$/.test(expr)) return "Error";
-        const result = Function(`"use strict"; return (${expr})`)();
-        return String(result);
-      } catch {
-        return "Error";
-      }
-    }
-
-    function handleCalculatorButton(value) {
-      if (value === "C") {
-        state.calcValue = "0";
-      } else if (value === "⌫") {
-        state.calcValue = state.calcValue.length > 1 ? state.calcValue.slice(0, -1) : "0";
-      } else if (value === "=") {
-        state.calcValue = calculateExpression(state.calcValue);
-      } else {
-        if (state.calcValue === "0" || state.calcValue === "Error") {
-          state.calcValue = value;
-        } else {
-          state.calcValue += value;
-        }
-      }
-      updateCalculatorDisplay();
-    }
-
-    $("theme-toggle").addEventListener("click", () => document.body.classList.toggle("light-mode"));
     $("tab-login").addEventListener("click", () => switchTab(0));
     $("tab-signup").addEventListener("click", () => switchTab(1));
-    $("go-signup").addEventListener("click", () => switchTab(1));
     $("go-login").addEventListener("click", () => switchTab(0));
+    $("go-signup").addEventListener("click", () => switchTab(1));
     $("l-eye").addEventListener("click", () => togglePw("l-pass", "l-eye"));
     $("s-eye").addEventListener("click", () => togglePw("s-pass", "s-eye"));
     $("login-btn").addEventListener("click", doLogin);
     $("signup-btn").addEventListener("click", doSignup);
     $("logout-btn").addEventListener("click", doLogout);
+    $("photo-btn").addEventListener("click", () => $("photo-upload-input").click());
+    $("cover-btn").addEventListener("click", () => $("cover-upload-input").click());
+    $("video-btn").addEventListener("click", () => $("video-upload-input").click());
     $("add-video-link").addEventListener("click", addVideoLink);
-    $("photo-btn").addEventListener("click", uploadPhoto);
-    $("cover-btn").addEventListener("click", uploadCover);
-    $("video-btn").addEventListener("click", uploadVideoFile);
-    $("photo-upload-input").addEventListener("change", handlePhotoFile);
-    $("cover-upload-input").addEventListener("change", handleCoverFile);
-    $("video-upload-input").addEventListener("change", handleVideoFile);
     $("add-post-btn").addEventListener("click", addPost);
     $("edit-profile-btn").addEventListener("click", openEditModal);
     $("cancel-edit-btn").addEventListener("click", closeEditModal);
     $("save-edit-btn").addEventListener("click", saveEditProfile);
     $("set-photo-url-btn").addEventListener("click", () => setUrl("photo"));
     $("set-cover-url-btn").addEventListener("click", () => setUrl("cover"));
-    $("open-calculator-btn").addEventListener("click", openCalculator);
-    $("open-calculator-btn-profile").addEventListener("click", openCalculator);
-    $("close-calculator-btn").addEventListener("click", closeCalculator);
 
-    $("calculator-modal").addEventListener("click", (e) => {
-      if (e.target.id === "calculator-modal") closeCalculator();
-    });
-
-    $("edit-modal").addEventListener("click", (e) => {
-      if (e.target.id === "edit-modal") closeEditModal();
-    });
+    $("photo-upload-input").addEventListener("change", uploadPhoto);
+    $("cover-upload-input").addEventListener("change", uploadCover);
+    $("video-upload-input").addEventListener("change", uploadVideoFile);
 
     $("video-grid").addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-action]");
       if (!btn) return;
       const index = Number(btn.dataset.index);
-      if (btn.dataset.action === "delete-video") deleteVideo(index);
-      if (btn.dataset.action === "rename-video") renameVideo(index);
+      const action = btn.dataset.action;
+      if (action === "delete-video") deleteVideo(index);
+      if (action === "rename-video") renameVideo(index);
     });
 
     $("posts-list").addEventListener("click", handlePostActions);
 
-    document.querySelector(".calc-grid").addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-calc]");
-      if (!btn) return;
-      handleCalculatorButton(btn.dataset.calc);
+    $("theme-toggle").addEventListener("click", () => {
+      document.body.classList.toggle("light-mode");
     });
 
-    $("open-calculator-btn").addEventListener("dblclick", openCalculator);
-
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
+      if (user) {
+        try {
+          const profile = await loadUserFromDb(user.uid);
+          cu = normalizeUserData(profile, user);
+          await saveUserToDb(cu);
+          renderProfile(cu);
+          renderVideos();
+          renderPosts();
+        } catch (error) {
+          console.error(error);
+          showAuthStatus("Failed to load profile.", false);
+        }
+      } else {
         cu = null;
-        $("auth-wrap").classList.remove("hidden");
         $("profile-wrap").classList.add("hidden");
-        return;
+        $("auth-wrap").classList.remove("hidden");
       }
-
-      const profile = await loadUserFromDb(user.uid);
-      cu = normalizeUserData(profile, user);
-      await saveUserToDb(cu);
-      renderProfile(cu);
-      renderVideos();
-      renderPosts();
     });
 
     switchTab(0);
-    updateCalculatorDisplay();
   </script>
 </body>
 </html>
