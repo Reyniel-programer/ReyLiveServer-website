@@ -179,7 +179,7 @@
       border: 1px solid #27272a;
       border-radius: 18px;
       padding: 18px;
-      position: absolute;
+      position: fixed;
       top: 100px;
       left: 50%;
       transform: translateX(-50%);
@@ -203,6 +203,7 @@
       background: #0f172a;
       color: #fff;
       overflow-x: auto;
+      user-select: text;
     }
 
     .calc-grid {
@@ -235,6 +236,11 @@
       .profile-body {
         grid-template-columns: 1fr;
       }
+
+      .modal-content {
+        width: calc(100% - 24px);
+        max-width: none;
+      }
     }
   </style>
 </head>
@@ -246,7 +252,7 @@
 
     <div class="profile-header">
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <img id="p-photo" class="profile-photo" src="" alt="Profile Photo">
+        <img id="p-photo" class="profile-photo" src="https://via.placeholder.com/110" alt="Profile Photo">
         <div>
           <h2 id="p-name">User Name</h2>
           <p id="p-username-tag">@username</p>
@@ -273,7 +279,6 @@
           <div><strong>Address:</strong> Sample Address</div>
         </div>
 
-        <!-- Change photo moved lower here -->
         <div class="upload-group">
           <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
           <input type="file" id="photo-upload-input" accept="image/*" class="hidden" />
@@ -300,7 +305,7 @@
   <!-- DRAGGABLE CALCULATOR -->
   <div id="calculator-modal" class="modal hidden">
     <div id="calculator-window" class="modal-content">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;">
         <h3>Calculator</h3>
         <button id="close-calculator-btn" class="btn btn-red">Close</button>
       </div>
@@ -338,6 +343,11 @@
     const calcModal = document.getElementById("calculator-modal");
     const calcWindow = document.getElementById("calculator-window");
     const calcDisplay = document.getElementById("calc-display");
+    const calcGrid = document.querySelector(".calc-grid");
+    const photoBtn = document.getElementById("photo-btn");
+    const photoInput = document.getElementById("photo-upload-input");
+    const profilePhoto = document.getElementById("p-photo");
+
     let calcValue = "0";
 
     document.getElementById("open-calculator-btn").addEventListener("click", () => {
@@ -361,22 +371,32 @@
     function solve(expr) {
       try {
         if (!/^[0-9+\-*/.() ]+$/.test(expr)) return "Error";
-        return String(Function(`return (${expr})`)());
+        const result = Function(`"use strict"; return (${expr})`)();
+        return Number.isFinite(result) ? String(result) : "Error";
       } catch {
         return "Error";
       }
     }
 
-    document.querySelector(".calc-grid").addEventListener("click", (e) => {
+    calcGrid.addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-calc]");
       if (!btn) return;
 
       const val = btn.dataset.calc;
 
-      if (val === "C") calcValue = "0";
-      else if (val === "⌫") calcValue = calcValue.length > 1 ? calcValue.slice(0, -1) : "0";
-      else if (val === "=") calcValue = solve(calcValue);
-      else calcValue = calcValue === "0" || calcValue === "Error" ? val : calcValue + val;
+      if (val === "C") {
+        calcValue = "0";
+      } else if (val === "⌫") {
+        calcValue = calcValue.length > 1 ? calcValue.slice(0, -1) : "0";
+      } else if (val === "=") {
+        calcValue = solve(calcValue);
+      } else {
+        if (calcValue === "0" || calcValue === "Error") {
+          calcValue = val;
+        } else {
+          calcValue += val;
+        }
+      }
 
       updateCalc();
     });
@@ -387,24 +407,40 @@
     let offsetY = 0;
 
     calcWindow.addEventListener("mousedown", (e) => {
-      if (e.target.tagName === "BUTTON" || e.target.tagName === "INPUT") return;
+      if (e.target.closest("button")) return;
       isDragging = true;
       calcWindow.classList.add("dragging");
       const rect = calcWindow.getBoundingClientRect();
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
+      calcWindow.style.transform = "none";
+      calcWindow.style.left = `${rect.left}px`;
+      calcWindow.style.top = `${rect.top}px`;
     });
 
     document.addEventListener("mousemove", (e) => {
       if (!isDragging) return;
       calcWindow.style.left = `${e.clientX - offsetX}px`;
       calcWindow.style.top = `${e.clientY - offsetY}px`;
-      calcWindow.style.transform = "none";
     });
 
     document.addEventListener("mouseup", () => {
       isDragging = false;
       calcWindow.classList.remove("dragging");
+    });
+
+    // Photo upload
+    photoBtn.addEventListener("click", () => photoInput.click());
+
+    photoInput.addEventListener("change", () => {
+      const file = photoInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        profilePhoto.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     });
 
     updateCalc();
