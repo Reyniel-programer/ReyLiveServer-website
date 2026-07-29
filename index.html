@@ -1087,3 +1087,1234 @@
   </script>
 </body>
 </html>
+
+How about I make it an URL the cover photo and the profile photo and make it Clickable and fix the post make the text bigger and has like and comment button make the information noticeable
+Generate
+Output
+Generated result
+
+
+Fixed and Improved Version
+You had a few issues mixed together in the request:
+
+Make cover photo and profile photo clickable URLs
+Improve the post layout so text is bigger and clearer
+Add Like and Comment buttons
+Make the user information more noticeable
+Fix a few code issues that could cause bugs
+Below is a corrected and improved version of your HTML/JavaScript.
+
+What was wrong / what was fixed
+1. Photos were not clickable
+Added clickable <a> links around the profile photo and cover photo.
+If a photo URL exists, clicking opens the image in a new tab.
+2. Post text was too small / not noticeable
+Increased post text size.
+Improved spacing and visual hierarchy.
+Added clearer card styling.
+3. Like and Comment buttons were missing
+Added Like and Comment buttons to each post.
+Likes are stored per post.
+Comments are added with a prompt dialog and shown below the post.
+4. User info was not very noticeable
+Improved the user info section styling.
+Added a stronger visual container and better readability.
+5. Small code issues
+Made post rendering more stable.
+Improved button updates after likes/comments.
+Added safer handling for missing arrays and optional data.
+Corrected Code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuthHub</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .tab-active {
+      border-bottom: 3px solid #f59e0b !important;
+      color: #f59e0b !important;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      border-radius: 12px;
+      color: #fff;
+      padding: 10px 14px;
+      width: 100%;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #f59e0b;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #a1a1aa;
+      margin-bottom: 6px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 11px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: opacity 0.15s;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-orange {
+      background: #f59e0b;
+      color: #000;
+    }
+
+    .btn-gray {
+      background: #3f3f46;
+      color: #fff;
+    }
+
+    .btn-red {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .btn-green {
+      background: #22c55e;
+      color: #000;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid #3f3f46;
+      color: #fff;
+      border-radius: 12px;
+      padding: 11px 18px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .btn-ghost:hover {
+      background: #27272a;
+    }
+
+    .status-bar {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-top: 12px;
+      font-size: 13px;
+      max-width: 90%;
+      word-break: break-word;
+    }
+
+    .rel-pw {
+      position: relative;
+    }
+
+    .pw-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #71717a;
+      font-size: 14px;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .video-card {
+      background: #27272a;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #3f3f46;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-player video,
+    .video-player iframe {
+      width: 100%;
+      height: 180px;
+      background: #000;
+      object-fit: cover;
+      border: 0;
+      display: block;
+    }
+
+    .video-info {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+
+    .section-box {
+      background: #18181b;
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid #27272a;
+    }
+
+    .upload-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .upload-group .btn {
+      flex: 1 1 160px;
+    }
+
+    .profile-cover {
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .profile-cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.35));
+      pointer-events: none;
+    }
+
+    .profile-cover .cover-actions {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      z-index: 1;
+    }
+
+    .profile-header {
+      background: #18181b;
+      padding: 24px;
+      border-bottom: 1px solid #27272a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .profile-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+
+    .profile-photo {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #f59e0b;
+      background: #27272a;
+      cursor: pointer;
+    }
+
+    .clickable-photo {
+      display: inline-block;
+      line-height: 0;
+    }
+
+    .post-box {
+      background: #18181b;
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid #27272a;
+      margin-top: 20px;
+    }
+
+    .post-card {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .post-text {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #f8fafc;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .post-meta {
+      color: #a1a1aa;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .post-comments {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #3f3f46;
+      color: #d4d4d8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .user-info-box {
+      background: #0f172a;
+      border: 1px solid #f59e0b33;
+      border-radius: 14px;
+      padding: 14px;
+      color: #e2e8f0;
+      line-height: 1.8;
+    }
+
+    .user-info-box strong {
+      color: #f59e0b;
+    }
+
+    .clickable-link {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    .clickable-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 700px) {
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-body {
+        grid-template-columns: 1fr !important;
+      }
+
+      .signup-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .span-2 {
+        grid-column: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div id="auth-wrap" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f172a,#18181b)">
+      <div style="width:100%;max-width:480px;background:#18181b;border-radius:24px;border:1px solid #f59e0b33;overflow:hidden;">
+        <div style="padding:32px 32px 24px;text-align:center;border-bottom:1px solid #27272a;">
+          <h1 style="font-size:24px;color:#f59e0b;font-weight:700;">AuthHub</h1>
+          <p style="color:#71717a;font-size:13px;margin-top:6px;">Login or create your personal profile</p>
+        </div>
+
+        <div style="display:flex;border-bottom:1px solid #27272a;">
+          <button type="button" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;">Login</button>
+          <button type="button" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;">Sign Up</button>
+        </div>
+
+        <div style="padding:28px;">
+          <div id="login-form">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div>
+                <label for="l-email">Email</label>
+                <input id="l-email" type="email" placeholder="Enter email" autocomplete="email" />
+              </div>
+
+              <div>
+                <label for="l-pass">Password</label>
+                <div class="rel-pw">
+                  <input id="l-pass" type="password" placeholder="Enter password" autocomplete="current-password" />
+                  <button type="button" class="pw-eye" id="l-eye">👁</button>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-orange" id="login-btn" style="width:100%;justify-content:center;">Sign In</button>
+            </div>
+
+            <p style="text-align:center;margin-top:16px;font-size:13px;color:#71717a;">
+              Don't have an account?
+              <span id="go-signup" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign up</span>
+            </p>
+          </div>
+
+          <div id="signup-form" class="hidden">
+            <div class="signup-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><label for="s-user">Username</label><input id="s-user" placeholder="Choose username" /></div>
+              <div><label for="s-name">Full Name</label><input id="s-name" placeholder="Your name" /></div>
+              <div><label for="s-email">Email</label><input id="s-email" type="email" placeholder="you@email.com" autocomplete="email" /></div>
+              <div><label for="s-phone">Phone</label><input id="s-phone" type="tel" placeholder="+63 9XX XXX XXX" /></div>
+
+              <div>
+                <label for="s-pass">Password</label>
+                <div class="rel-pw">
+                  <input id="s-pass" type="password" placeholder="Min 6 chars" autocomplete="new-password" />
+                  <button type="button" class="pw-eye" id="s-eye">👁</button>
+                </div>
+              </div>
+
+              <div><label for="s-age">Age</label><input id="s-age" type="number" placeholder="Age" /></div>
+
+              <div>
+                <label for="s-gender">Gender</label>
+                <select id="s-gender">
+                  <option value="">Select</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Prefer not to say</option>
+                </select>
+              </div>
+
+              <div><label for="s-bday">Birthday</label><input id="s-bday" type="date" /></div>
+              <div class="span-2" style="grid-column:span 2"><label for="s-addr">Address</label><input id="s-addr" placeholder="Your address" /></div>
+              <div class="span-2" style="grid-column:span 2"><label for="s-bio">Bio</label><textarea id="s-bio" rows="2" placeholder="Tell something about yourself"></textarea></div>
+
+              <div class="span-2" style="grid-column:span 2">
+                <button type="button" class="btn btn-orange" id="signup-btn" style="width:100%;justify-content:center;">Create Account</button>
+              </div>
+            </div>
+
+            <p style="text-align:center;margin-top:14px;font-size:13px;color:#71717a;">
+              Already have an account?
+              <span id="go-login" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign in</span>
+            </p>
+          </div>
+
+          <div id="auth-status"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="profile-wrap" class="hidden" style="background:#09090b;min-height:100vh;">
+      <div id="cover-bg" class="profile-cover">
+        <div class="cover-actions">
+          <a id="cover-link" href="#" target="_blank" class="hidden clickable-link" style="display:none;">Open Cover</a>
+          <button type="button" class="btn btn-orange" id="cover-btn">Change Cover</button>
+          <input type="file" id="cover-upload-input" accept="image/*" class="hidden" />
+        </div>
+      </div>
+
+      <div class="profile-header">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <a id="photo-link" href="#" target="_blank" class="clickable-photo">
+            <img id="p-photo" class="profile-photo" src="" alt="Profile photo" />
+          </a>
+          <div>
+            <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
+            <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-gray" id="edit-profile-btn">Edit Profile</button>
+          <button type="button" class="btn btn-ghost" id="logout-btn">Log Out</button>
+        </div>
+      </div>
+
+      <div class="profile-body">
+        <div class="section-box">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile</h3>
+          <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
+
+          <div class="upload-group">
+            <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
+            <input type="file" id="photo-upload-input" accept="image/*" class="hidden" />
+          </div>
+
+          <div class="upload-group">
+            <input type="text" id="video-link" placeholder="Paste YouTube URL or direct video URL" />
+            <button type="button" id="add-video-link" class="btn btn-gray">Add Video Link</button>
+          </div>
+
+          <div class="upload-group">
+            <button type="button" class="btn btn-orange" id="video-btn">Upload Video File</button>
+            <input type="file" id="video-upload-input" accept="video/*" class="hidden" />
+          </div>
+
+          <div style="margin-top:18px;">
+            <h4 style="margin-bottom:10px;">User Information</h4>
+            <div class="user-info-box" id="user-info"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;">
+              <h3 style="font-size:16px;font-weight:700;">My Videos</h3>
+            </div>
+
+            <div id="video-grid" class="video-grid"></div>
+            <div id="no-videos" style="text-align:center;padding:40px 20px;color:#71717a;display:none;">
+              No videos yet. Add or upload your first video!
+            </div>
+          </div>
+
+          <div class="post-box">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Posts & Comments</h3>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <textarea id="post-text" rows="3" placeholder="Write a post..."></textarea>
+              <button type="button" class="btn btn-orange" id="add-post-btn">Add Post</button>
+            </div>
+
+            <div id="posts-list" style="margin-top:16px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="prof-status" style="text-align:center;padding:0 0 20px;"></div>
+
+      <div id="edit-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999;">
+        <div style="width:100%;max-width:560px;background:#18181b;border:1px solid #27272a;border-radius:20px;padding:20px;">
+          <h3 style="margin-bottom:14px;">Edit Profile</h3>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label>Full Name</label><input id="edit-name" /></div>
+            <div><label>Username</label><input id="edit-username" /></div>
+            <div><label>Phone</label><input id="edit-phone" /></div>
+            <div><label>Age</label><input id="edit-age" type="number" /></div>
+            <div><label>Gender</label><input id="edit-gender" /></div>
+            <div><label>Birthday</label><input id="edit-birthday" type="date" /></div>
+            <div style="grid-column:span 2;"><label>Address</label><input id="edit-address" /></div>
+            <div style="grid-column:span 2;"><label>Bio</label><textarea id="edit-bio" rows="3"></textarea></div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-gray" id="cancel-edit-btn">Cancel</button>
+            <button type="button" class="btn btn-orange" id="save-edit-btn">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
+      authDomain: "reyliveserver-73cba.firebaseapp.com",
+      projectId: "reyliveserver-73cba",
+      storageBucket: "reyliveserver-73cba.firebasestorage.app",
+      messagingSenderId: "220200732080",
+      appId: "1:220200732080:web:463bceaa7189f7ad3b4275"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    let cu = null;
+    const $ = (id) => document.getElementById(id);
+    const state = { logging: false };
+
+    const PROFILE_PLACEHOLDER =
+      "data:image/svg+xml;charset=UTF-8," +
+      encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+          <rect width="200" height="200" rx="100" fill="#27272a"/>
+          <circle cx="100" cy="78" r="34" fill="#71717a"/>
+          <path d="M40 170c10-31 38-50 60-50s50 19 60 50" fill="#71717a"/>
+        </svg>
+      `);
+
+    function setStatus(elId, msg, ok) {
+      const el = $(elId);
+      if (!el) return;
+      el.innerHTML = "";
+      const div = document.createElement("div");
+      div.className = "status-bar";
+      div.style.background = ok ? "#14532d" : "#7f1d1d";
+      div.textContent = msg;
+      el.appendChild(div);
+    }
+
+    const showAuthStatus = (msg, ok) => setStatus("auth-status", msg, ok);
+    const showProfStatus = (msg, ok) => setStatus("prof-status", msg, ok);
+
+    function defaultUser(uid, email, displayName) {
+      return {
+        uid,
+        email,
+        name: displayName || "User",
+        username: email?.split("@")[0] || "user",
+        phone: "",
+        age: "",
+        gender: "",
+        birthday: "",
+        address: "",
+        bio: "",
+        photoUrl: "",
+        coverUrl: "",
+        videos: [],
+        posts: [],
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    async function saveUserToDb(userData) {
+      if (!userData?.uid) throw new Error("Missing user UID");
+      await setDoc(doc(db, "users", userData.uid), userData, { merge: true });
+    }
+
+    async function loadUserFromDb(uid) {
+      const snap = await getDoc(doc(db, "users", uid));
+      return snap.exists() ? snap.data() : null;
+    }
+
+    function switchTab(t) {
+      $("login-form").classList.toggle("hidden", t !== 0);
+      $("signup-form").classList.toggle("hidden", t !== 1);
+      $("tab-login").classList.toggle("tab-active", t === 0);
+      $("tab-signup").classList.toggle("tab-active", t === 1);
+      $("tab-login").style.color = t === 0 ? "#f59e0b" : "#71717a";
+      $("tab-signup").style.color = t === 1 ? "#f59e0b" : "#71717a";
+      $("auth-status").innerHTML = "";
+    }
+
+    function togglePw(inputId, btnId) {
+      const input = $(inputId);
+      const btn = $(btnId);
+      if (!input || !btn) return;
+      input.type = input.type === "password" ? "text" : "password";
+      btn.textContent = input.type === "password" ? "👁" : "🙈";
+    }
+
+    function setLoading(buttonId, isLoading, text) {
+      const btn = $(buttonId);
+      if (!btn) return;
+      btn.disabled = isLoading;
+      btn.textContent = text;
+    }
+
+    function normalizeUserData(profile, user) {
+      const base = defaultUser(user.uid, user.email, user.displayName);
+      return {
+        ...base,
+        ...(profile || {}),
+        uid: user.uid,
+        email: user.email || profile?.email || "",
+        name: profile?.name || user.displayName || base.name,
+        username: profile?.username || base.username,
+        videos: Array.isArray(profile?.videos) ? profile.videos : [],
+        posts: Array.isArray(profile?.posts) ? profile.posts : []
+      };
+    }
+
+    function renderProfile(user) {
+      $("auth-wrap").classList.add("hidden");
+      $("profile-wrap").classList.remove("hidden");
+
+      $("p-name").textContent = user?.name || user?.username || "User";
+      $("p-username-tag").textContent = user?.username ? `@${user.username}` : "";
+      $("p-bio").textContent = user?.bio || "No bio added";
+
+      $("p-photo").src = user?.photoUrl || PROFILE_PLACEHOLDER;
+      $("photo-link").href = user?.photoUrl || PROFILE_PLACEHOLDER;
+
+      const cover = $("cover-bg");
+      cover.style.backgroundImage = user?.coverUrl ? `url("${user.coverUrl}")` : "linear-gradient(135deg,#1d4ed8,#38bdf8)";
+
+      const coverLink = $("cover-link");
+      if (user?.coverUrl) {
+        coverLink.href = user.coverUrl;
+        coverLink.style.display = "inline-flex";
+        coverLink.classList.remove("hidden");
+      } else {
+        coverLink.href = "#";
+        coverLink.style.display = "none";
+        coverLink.classList.add("hidden");
+      }
+
+      $("user-info").innerHTML = `
+        <div><strong>Email:</strong> ${user.email || "N/A"}</div>
+        <div><strong>Phone:</strong> ${user.phone || "N/A"}</div>
+        <div><strong>Age:</strong> ${user.age || "N/A"}</div>
+        <div><strong>Gender:</strong> ${user.gender || "N/A"}</div>
+        <div><strong>Birthday:</strong> ${user.birthday || "N/A"}</div>
+        <div><strong>Address:</strong> ${user.address || "N/A"}</div>
+      `;
+    }
+
+    function renderVideos() {
+      const container = $("video-grid");
+      const noVideos = $("no-videos");
+      if (!container || !noVideos) return;
+
+      container.innerHTML = "";
+      const videos = Array.isArray(cu?.videos) ? cu.videos : [];
+
+      if (!videos.length) {
+        noVideos.style.display = "block";
+        return;
+      }
+
+      noVideos.style.display = "none";
+
+      videos.forEach((video, index) => {
+        const card = document.createElement("div");
+        card.className = "video-card";
+
+        const mediaHtml =
+          video?.type === "youtube" && video?.embedUrl
+            ? `<iframe src="${video.embedUrl}" allowfullscreen></iframe>`
+            : video?.url
+              ? `<video src="${video.url}" controls preload="metadata"></video>`
+              : "";
+
+        card.innerHTML = `
+          <div class="video-player">${mediaHtml}</div>
+          <div class="video-info">
+            <div style="font-size:14px;font-weight:600;word-break:break-word;">${video?.title || "Untitled Video"}</div>
+            <div style="font-size:12px;color:#71717a;">${video?.addedAt ? new Date(video.addedAt).toLocaleDateString() : ""}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" data-action="delete-video" data-index="${index}" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
+              <button type="button" data-action="rename-video" data-index="${index}" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderPosts() {
+      const list = $("posts-list");
+      if (!list) return;
+      list.innerHTML = "";
+      const posts = Array.isArray(cu?.posts) ? cu.posts : [];
+
+      if (!posts.length) {
+        list.innerHTML = `<div style="color:#71717a;font-size:13px;">No posts yet.</div>`;
+        return;
+      }
+
+      posts.slice().reverse().forEach((post, index) => {
+        const actualIndex = posts.length - 1 - index;
+        const likes = post.likes || 0;
+        const comments = Array.isArray(post.comments) ? post.comments : [];
+
+        const div = document.createElement("div");
+        div.className = "post-card";
+        div.innerHTML = `
+          <div class="post-text">${post.text || ""}</div>
+          <div class="post-meta">${post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}</div>
+
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-green" data-post-action="like" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
+              Like (${likes})
+            </button>
+            <button type="button" class="btn btn-gray" data-post-action="comment" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
+              Comment (${comments.length})
+            </button>
+            <button type="button" class="btn btn-red" data-post-action="delete" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
+              Delete
+            </button>
+          </div>
+
+          ${comments.length ? `
+            <div class="post-comments">
+              <strong style="color:#f59e0b;">Comments:</strong>
+              <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+                ${comments.map(c => `<div>• ${c}</div>`).join("")}
+              </div>
+            </div>
+          ` : ""}
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function persistUser(userData) {
+      cu = userData;
+      await saveUserToDb(userData);
+      renderProfile(userData);
+      renderVideos();
+      renderPosts();
+    }
+
+    async function uploadMedia(file, folder) {
+      if (!cu?.uid) throw new Error("No logged in user");
+      if (!file) throw new Error("No file selected");
+
+      const isImage = file.type.startsWith("image/");
+      const isVideo = file.type.startsWith("video/");
+
+      if (folder === "videos" && !isVideo) throw new Error("Please select a valid video file.");
+      if (folder !== "videos" && !isImage) throw new Error("Please select a valid image file.");
+
+      const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+      const fileRef = ref(storage, `${folder}/${cu.uid}/${Date.now()}-${safeName}`);
+
+      await uploadBytes(fileRef, file);
+      return await getDownloadURL(fileRef);
+    }
+
+    async function doSignup() {
+      if (state.logging) return;
+
+      const email = $("s-email").value.trim();
+      const password = $("s-pass").value.trim();
+
+      const user = {
+        username: $("s-user").value.trim(),
+        name: $("s-name").value.trim(),
+        email,
+        phone: $("s-phone").value.trim(),
+        age: $("s-age").value.trim(),
+        gender: $("s-gender").value,
+        birthday: $("s-bday").value,
+        address: $("s-addr").value.trim(),
+        bio: $("s-bio").value.trim(),
+        photoUrl: "",
+        coverUrl: "",
+        videos: [],
+        posts: [],
+        createdAt: new Date().toISOString()
+      };
+
+      if (!user.username || !user.name || !email || !password) {
+        showAuthStatus("Please fill in all required fields.", false);
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthStatus("Password must be at least 6 characters.", false);
+        return;
+      }
+
+      try {
+        state.logging = true;
+        setLoading("signup-btn", true, "Creating account...");
+
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: user.name });
+
+        user.uid = cred.user.uid;
+        await saveUserToDb(user);
+
+        showAuthStatus("Account created successfully.", true);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus(error.message || "Signup failed.", false);
+      } finally {
+        state.logging = false;
+        setLoading("signup-btn", false, "Create Account");
+      }
+    }
+
+    async function doLogin() {
+      if (state.logging) return;
+
+      const email = $("l-email").value.trim();
+      const password = $("l-pass").value.trim();
+
+      if (!email || !password) {
+        showAuthStatus("Please enter your email and password.", false);
+        return;
+      }
+
+      try {
+        state.logging = true;
+        setLoading("login-btn", true, "Signing in...");
+
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const profile = await loadUserFromDb(cred.user.uid);
+        cu = normalizeUserData(profile, cred.user);
+
+        await saveUserToDb(cu);
+
+        showAuthStatus("Login successful!", true);
+        renderProfile(cu);
+        renderVideos();
+        renderPosts();
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Invalid email or password.", false);
+      } finally {
+        state.logging = false;
+        setLoading("login-btn", false, "Sign In");
+      }
+    }
+
+    async function doLogout() {
+      try {
+        await signOut(auth);
+        cu = null;
+        $("profile-wrap").classList.add("hidden");
+        $("auth-wrap").classList.remove("hidden");
+        $("prof-status").innerHTML = "";
+        showAuthStatus("Logged out successfully.", true);
+      } catch (error) {
+        console.error(error);
+        showAuthStatus("Logout failed.", false);
+      }
+    }
+
+    async function addVideoLink() {
+      const url = $("video-link").value.trim();
+      if (!url || !cu) {
+        showProfStatus("Please paste a valid video URL.", false);
+        return;
+      }
+
+      let videoData = {
+        title: "Video Link",
+        addedAt: new Date().toISOString(),
+        url,
+        type: "link"
+      };
+
+      const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+      if (yt) {
+        const videoId = yt[1];
+        videoData = {
+          title: "YouTube Video",
+          addedAt: new Date().toISOString(),
+          type: "youtube",
+          url,
+          embedUrl: `https://www.youtube.com/embed/${videoId}`
+        };
+      }
+
+      cu.videos = Array.isArray(cu.videos) ? cu.videos : [];
+      cu.videos.push(videoData);
+
+      try {
+        await persistUser(cu);
+        showProfStatus("Video link saved successfully!", true);
+        $("video-link").value = "";
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to save video link.", false);
+      }
+    }
+
+    async function uploadPhoto(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        showProfStatus("Uploading photo...", true);
+        const url = await uploadMedia(file, "photos");
+        cu.photoUrl = url;
+        await persistUser(cu);
+        showProfStatus("Profile photo updated successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to upload photo.", false);
+      } finally {
+        e.target.value = "";
+      }
+    }
+
+    async function uploadCover(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        showProfStatus("Uploading cover...", true);
+        const url = await uploadMedia(file, "covers");
+        cu.coverUrl = url;
+        await persistUser(cu);
+        showProfStatus("Cover photo updated successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to upload cover photo.", false);
+      } finally {
+        e.target.value = "";
+      }
+    }
+
+    async function uploadVideoFile(e) {
+      const file = e.target.files?.[0];
+      if (!file || !cu) return;
+
+      try {
+        showProfStatus("Uploading video...", true);
+        const url = await uploadMedia(file, "videos");
+
+        cu.videos = Array.isArray(cu.videos) ? cu.videos : [];
+        cu.videos.push({
+          title: file.name.replace(/\.[^/.]+$/, ""),
+          addedAt: new Date().toISOString(),
+          url,
+          type: "storage"
+        });
+
+        await persistUser(cu);
+        showProfStatus("Video uploaded successfully!", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus(error.message || "Failed to upload video.", false);
+      } finally {
+        e.target.value = "";
+      }
+    }
+
+    async function deleteVideo(index) {
+      if (!cu?.videos?.length || index < 0 || index >= cu.videos.length) return;
+      if (!confirm("Delete this video?")) return;
+
+      cu.videos.splice(index, 1);
+
+      try {
+        await persistUser(cu);
+        showProfStatus("Video deleted.", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to delete video.", false);
+      }
+    }
+
+    async function renameVideo(index) {
+      if (!cu?.videos?.length || index < 0 || index >= cu.videos.length) return;
+
+      const newTitle = prompt("New title:", cu.videos[index].title || "");
+      if (newTitle === null) return;
+
+      cu.videos[index].title = newTitle.trim() || "Untitled Video";
+
+      try {
+        await persistUser(cu);
+        showProfStatus("Video renamed.", true);
+      } catch (error) {
+        console.error(error);
+        showProfStatus("Failed to rename video.", false);
+      }
+    }
+
+    async function addPost() {
+      const text = $("post-text").value.trim();
+      if (!text || !cu) {
+        showProfStatus("Write something before posting.", false);
+        return;
+      }
+
+      cu.posts = Array.isArray(cu.posts) ? cu.posts : [];
+      cu.posts.push({
+        text,
+        createdAt: new Date().toISOString(),
+        likes: 0,
+        comments: []
+      });
+
+      await persistUser(cu);
+      $("post-text").value = "";
+      showProfStatus("Post added successfully.", true);
+    }
+
+    async function handlePostActions(e) {
+      const btn = e.target.closest("button[data-post-action]");
+      if (!btn || !cu) return;
+
+      const index = Number(btn.dataset.index);
+      const action = btn.dataset.postAction;
+
+      if (!Array.isArray(cu.posts) || index < 0 || index >= cu.posts.length) return;
+
+      if (action === "delete") {
+        cu.posts.splice(index, 1);
+        await persistUser(cu);
+        showProfStatus("Post deleted.", true);
+      }
+
+      if (action === "edit") {
+        const newText = prompt("Edit post:", cu.posts[index].text || "");
+        if (newText === null) return;
+        cu.posts[index].text = newText.trim() || cu.posts[index].text;
+        await persistUser(cu);
+        showProfStatus("Post updated.", true);
+      }
+
+      if (action === "like") {
+        cu.posts[index].likes = (cu.posts[index].likes || 0) + 1;
+        await persistUser(cu);
+        showProfStatus("Post liked.", true);
+      }
+
+      if (action === "comment") {
+        const comment = prompt("Write a comment:");
+        if (comment === null) return;
+        const c = comment.trim();
+        if (!c) return;
+
+        cu.posts[index].comments = Array.isArray(cu.posts[index].comments) ? cu.posts[index].comments : [];
+        cu.posts[index].comments.push(c);
+        await persistUser(cu);
+        showProfStatus("Comment added.", true);
+      }
+    }
+
+    function openEditModal() {
+      if (!cu) return;
+      $("edit-name").value = cu.name || "";
+      $("edit-username").value = cu.username || "";
+      $("edit-phone").value = cu.phone || "";
+      $("edit-age").value = cu.age || "";
+      $("edit-gender").value = cu.gender || "";
+      $("edit-birthday").value = cu.birthday || "";
+      $("edit-address").value = cu.address || "";
+      $("edit-bio").value = cu.bio || "";
+      $("edit-modal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      $("edit-modal").classList.add("hidden");
+    }
+
+    async function saveEditProfile() {
+      if (!cu) return;
+
+      cu.name = $("edit-name").value.trim();
+      cu.username = $("edit-username").value.trim();
+      cu.phone = $("edit-phone").value.trim();
+      cu.age = $("edit-age").value.trim();
+      cu.gender = $("edit-gender").value.trim();
+      cu.birthday = $("edit-birthday").value;
+      cu.address = $("edit-address").value.trim();
+      cu.bio = $("edit-bio").value.trim();
+
+      await persistUser(cu);
+      closeEditModal();
+      showProfStatus("Profile updated successfully.", true);
+    }
+
+    $("tab-login").addEventListener("click", () => switchTab(0));
+    $("tab-signup").addEventListener("click", () => switchTab(1));
+    $("go-login").addEventListener("click", () => switchTab(0));
+    $("go-signup").addEventListener("click", () => switchTab(1));
+    $("l-eye").addEventListener("click", () => togglePw("l-pass", "l-eye"));
+    $("s-eye").addEventListener("click", () => togglePw("s-pass", "s-eye"));
+    $("login-btn").addEventListener("click", doLogin);
+    $("signup-btn").addEventListener("click", doSignup);
+    $("logout-btn").addEventListener("click", doLogout);
+    $("photo-btn").addEventListener("click", () => $("photo-upload-input").click());
+    $("cover-btn").addEventListener("click", () => $("cover-upload-input").click());
+    $("video-btn").addEventListener("click", () => $("video-upload-input").click());
+    $("add-video-link").addEventListener("click", addVideoLink);
+    $("add-post-btn").addEventListener("click", addPost);
+    $("edit-profile-btn").addEventListener("click", openEditModal);
+    $("cancel-edit-btn").addEventListener("click", closeEditModal);
+    $("save-edit-btn").addEventListener("click", saveEditProfile);
+
+    $("photo-upload-input").addEventListener("change", uploadPhoto);
+    $("cover-upload-input").addEventListener("change", uploadCover);
+    $("video-upload-input").addEventListener("change", uploadVideoFile);
+
+    $("video-grid").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const index = Number(btn.dataset.index);
+      const action = btn.dataset.action;
+      if (action === "delete-video") deleteVideo(index);
+      if (action === "rename-video") renameVideo(index);
+    });
+
+    $("posts-list").addEventListener("click", handlePostActions);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const profile = await loadUserFromDb(user.uid);
+          cu = normalizeUserData(profile, user);
+          await saveUserToDb(cu);
+          renderProfile(cu);
+          renderVideos();
+          renderPosts();
+        } catch (error) {
+          console.error(error);
+          showAuthStatus("Failed to load profile.", false);
+        }
+      } else {
+        cu = null;
+        $("profile-wrap").classList.add("hidden");
+        $("auth-wrap").classList.remove("hidden");
+      }
+    });
+
+    switchTab(0);
+  </script>
+</body>
+</html>
