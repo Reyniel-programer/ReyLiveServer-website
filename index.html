@@ -242,6 +242,28 @@
       background: #27272a;
     }
 
+    .post-box {
+      background: #18181b;
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid #27272a;
+      margin-top: 20px;
+    }
+
+    .post-card {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .post-meta {
+      color: #a1a1aa;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
     @media (max-width: 700px) {
       .video-grid {
         grid-template-columns: 1fr;
@@ -365,7 +387,10 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-ghost" id="logout-btn">Log Out</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-gray" id="edit-profile-btn">Edit Profile</button>
+          <button type="button" class="btn btn-ghost" id="logout-btn">Log Out</button>
+        </div>
       </div>
 
       <div class="profile-body">
@@ -379,7 +404,7 @@
           </div>
 
           <div class="upload-group">
-            <input type="text" id="video-link" placeholder="Paste YouTube URL or use upload below" />
+            <input type="text" id="video-link" placeholder="Paste YouTube URL or direct video URL" />
             <button type="button" id="add-video-link" class="btn btn-gray">Add Video Link</button>
           </div>
 
@@ -387,21 +412,61 @@
             <button type="button" class="btn btn-orange" id="video-btn">Upload Video File</button>
             <input type="file" id="video-upload-input" accept="video/*" class="hidden" />
           </div>
+
+          <div style="margin-top:18px;">
+            <h4 style="margin-bottom:10px;">User Information</h4>
+            <div id="user-info" style="color:#a1a1aa;font-size:13px;line-height:1.7;"></div>
+          </div>
         </div>
 
-        <div class="section-box">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;">
-            <h3 style="font-size:16px;font-weight:700;">My Videos</h3>
+        <div>
+          <div class="section-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;">
+              <h3 style="font-size:16px;font-weight:700;">My Videos</h3>
+            </div>
+
+            <div id="video-grid" class="video-grid"></div>
+            <div id="no-videos" style="text-align:center;padding:40px 20px;color:#71717a;display:none;">
+              No videos yet. Add or upload your first video!
+            </div>
           </div>
 
-          <div id="video-grid" class="video-grid"></div>
-          <div id="no-videos" style="text-align:center;padding:40px 20px;color:#71717a;display:none;">
-            No videos yet. Add or upload your first video!
+          <div class="post-box">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Posts & Comments</h3>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <textarea id="post-text" rows="3" placeholder="Write a post..."></textarea>
+              <button type="button" class="btn btn-orange" id="add-post-btn">Add Post</button>
+            </div>
+
+            <div id="posts-list" style="margin-top:16px;"></div>
           </div>
         </div>
       </div>
 
       <div id="prof-status" style="text-align:center;padding:0 0 20px;"></div>
+
+      <div id="edit-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999;">
+        <div style="width:100%;max-width:560px;background:#18181b;border:1px solid #27272a;border-radius:20px;padding:20px;">
+          <h3 style="margin-bottom:14px;">Edit Profile</h3>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label>Full Name</label><input id="edit-name" /></div>
+            <div><label>Username</label><input id="edit-username" /></div>
+            <div><label>Phone</label><input id="edit-phone" /></div>
+            <div><label>Age</label><input id="edit-age" type="number" /></div>
+            <div><label>Gender</label><input id="edit-gender" /></div>
+            <div><label>Birthday</label><input id="edit-birthday" type="date" /></div>
+            <div style="grid-column:span 2;"><label>Address</label><input id="edit-address" /></div>
+            <div style="grid-column:span 2;"><label>Bio</label><textarea id="edit-bio" rows="3"></textarea></div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-gray" id="cancel-edit-btn">Cancel</button>
+            <button type="button" class="btn btn-orange" id="save-edit-btn">Save Changes</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -432,7 +497,7 @@
       apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
       authDomain: "reyliveserver-73cba.firebaseapp.com",
       projectId: "reyliveserver-73cba",
-      storageBucket: "reyliveserver-73cba.appspot.com",
+      storageBucket: "reyliveserver-73cba.firebasestorage.app",
       messagingSenderId: "220200732080",
       appId: "1:220200732080:web:463bceaa7189f7ad3b4275"
     };
@@ -485,6 +550,7 @@
         photoUrl: "",
         coverUrl: "",
         videos: [],
+        posts: [],
         createdAt: new Date().toISOString()
       };
     }
@@ -533,7 +599,8 @@
         email: user.email || profile?.email || "",
         name: profile?.name || user.displayName || base.name,
         username: profile?.username || base.username,
-        videos: Array.isArray(profile?.videos) ? profile.videos : []
+        videos: Array.isArray(profile?.videos) ? profile.videos : [],
+        posts: Array.isArray(profile?.posts) ? profile.posts : []
       };
     }
 
@@ -548,6 +615,15 @@
 
       const cover = $("cover-bg");
       cover.style.backgroundImage = user?.coverUrl ? `url("${user.coverUrl}")` : "linear-gradient(135deg,#1d4ed8,#38bdf8)";
+
+      $("user-info").innerHTML = `
+        <div><strong>Email:</strong> ${user.email || "N/A"}</div>
+        <div><strong>Phone:</strong> ${user.phone || "N/A"}</div>
+        <div><strong>Age:</strong> ${user.age || "N/A"}</div>
+        <div><strong>Gender:</strong> ${user.gender || "N/A"}</div>
+        <div><strong>Birthday:</strong> ${user.birthday || "N/A"}</div>
+        <div><strong>Address:</strong> ${user.address || "N/A"}</div>
+      `;
     }
 
     function renderVideos() {
@@ -591,11 +667,38 @@
       });
     }
 
+    function renderPosts() {
+      const list = $("posts-list");
+      if (!list) return;
+      list.innerHTML = "";
+      const posts = Array.isArray(cu?.posts) ? cu.posts : [];
+
+      if (!posts.length) {
+        list.innerHTML = `<div style="color:#71717a;font-size:13px;">No posts yet.</div>`;
+        return;
+      }
+
+      posts.slice().reverse().forEach((post, index) => {
+        const div = document.createElement("div");
+        div.className = "post-card";
+        div.innerHTML = `
+          <div>${post.text || ""}</div>
+          <div class="post-meta">${post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-gray" data-post-action="edit" data-index="${index}" style="padding:6px 12px;font-size:12px;">Edit</button>
+            <button type="button" class="btn btn-red" data-post-action="delete" data-index="${index}" style="padding:6px 12px;font-size:12px;">Delete</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
     async function persistUser(userData) {
       cu = userData;
       await saveUserToDb(userData);
       renderProfile(userData);
       renderVideos();
+      renderPosts();
     }
 
     async function uploadMedia(file, folder) {
@@ -634,6 +737,7 @@
         photoUrl: "",
         coverUrl: "",
         videos: [],
+        posts: [],
         createdAt: new Date().toISOString()
       };
 
@@ -691,9 +795,10 @@
         showAuthStatus("Login successful!", true);
         renderProfile(cu);
         renderVideos();
+        renderPosts();
       } catch (error) {
         console.error(error);
-        showAuthStatus(error.message || "Invalid email or password.", false);
+        showAuthStatus("Invalid email or password.", false);
       } finally {
         state.logging = false;
         setLoading("login-btn", false, "Sign In");
@@ -724,7 +829,8 @@
       let videoData = {
         title: "Video Link",
         addedAt: new Date().toISOString(),
-        url
+        url,
+        type: "link"
       };
 
       const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
@@ -764,7 +870,7 @@
         showProfStatus("Profile photo updated successfully!", true);
       } catch (error) {
         console.error(error);
-        showProfStatus(error.message || "Failed to upload photo. Check Firebase Storage CORS.", false);
+        showProfStatus(error.message || "Failed to upload photo.", false);
       } finally {
         e.target.value = "";
       }
@@ -782,7 +888,7 @@
         showProfStatus("Cover photo updated successfully!", true);
       } catch (error) {
         console.error(error);
-        showProfStatus(error.message || "Failed to upload cover photo. Check Firebase Storage CORS.", false);
+        showProfStatus(error.message || "Failed to upload cover photo.", false);
       } finally {
         e.target.value = "";
       }
@@ -808,7 +914,7 @@
         showProfStatus("Video uploaded successfully!", true);
       } catch (error) {
         console.error(error);
-        showProfStatus(error.message || "Failed to upload video. Check Firebase Storage CORS.", false);
+        showProfStatus(error.message || "Failed to upload video.", false);
       } finally {
         e.target.value = "";
       }
@@ -846,6 +952,84 @@
       }
     }
 
+    async function addPost() {
+      const text = $("post-text").value.trim();
+      if (!text || !cu) {
+        showProfStatus("Write something before posting.", false);
+        return;
+      }
+
+      cu.posts = Array.isArray(cu.posts) ? cu.posts : [];
+      cu.posts.push({
+        text,
+        createdAt: new Date().toISOString(),
+        comments: []
+      });
+
+      await persistUser(cu);
+      $("post-text").value = "";
+      showProfStatus("Post added successfully.", true);
+    }
+
+    async function handlePostActions(e) {
+      const btn = e.target.closest("button[data-post-action]");
+      if (!btn || !cu) return;
+
+      const index = Number(btn.dataset.index);
+      const action = btn.dataset.postAction;
+
+      const actualIndex = cu.posts.length - 1 - index;
+      if (actualIndex < 0 || actualIndex >= cu.posts.length) return;
+
+      if (action === "delete") {
+        cu.posts.splice(actualIndex, 1);
+        await persistUser(cu);
+        showProfStatus("Post deleted.", true);
+      }
+
+      if (action === "edit") {
+        const newText = prompt("Edit post:", cu.posts[actualIndex].text || "");
+        if (newText === null) return;
+        cu.posts[actualIndex].text = newText.trim() || cu.posts[actualIndex].text;
+        await persistUser(cu);
+        showProfStatus("Post updated.", true);
+      }
+    }
+
+    function openEditModal() {
+      if (!cu) return;
+      $("edit-name").value = cu.name || "";
+      $("edit-username").value = cu.username || "";
+      $("edit-phone").value = cu.phone || "";
+      $("edit-age").value = cu.age || "";
+      $("edit-gender").value = cu.gender || "";
+      $("edit-birthday").value = cu.birthday || "";
+      $("edit-address").value = cu.address || "";
+      $("edit-bio").value = cu.bio || "";
+      $("edit-modal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      $("edit-modal").classList.add("hidden");
+    }
+
+    async function saveEditProfile() {
+      if (!cu) return;
+
+      cu.name = $("edit-name").value.trim();
+      cu.username = $("edit-username").value.trim();
+      cu.phone = $("edit-phone").value.trim();
+      cu.age = $("edit-age").value.trim();
+      cu.gender = $("edit-gender").value.trim();
+      cu.birthday = $("edit-birthday").value;
+      cu.address = $("edit-address").value.trim();
+      cu.bio = $("edit-bio").value.trim();
+
+      await persistUser(cu);
+      closeEditModal();
+      showProfStatus("Profile updated successfully.", true);
+    }
+
     $("tab-login").addEventListener("click", () => switchTab(0));
     $("tab-signup").addEventListener("click", () => switchTab(1));
     $("go-login").addEventListener("click", () => switchTab(0));
@@ -859,6 +1043,10 @@
     $("cover-btn").addEventListener("click", () => $("cover-upload-input").click());
     $("video-btn").addEventListener("click", () => $("video-upload-input").click());
     $("add-video-link").addEventListener("click", addVideoLink);
+    $("add-post-btn").addEventListener("click", addPost);
+    $("edit-profile-btn").addEventListener("click", openEditModal);
+    $("cancel-edit-btn").addEventListener("click", closeEditModal);
+    $("save-edit-btn").addEventListener("click", saveEditProfile);
 
     $("photo-upload-input").addEventListener("change", uploadPhoto);
     $("cover-upload-input").addEventListener("change", uploadCover);
@@ -873,6 +1061,8 @@
       if (action === "rename-video") renameVideo(index);
     });
 
+    $("posts-list").addEventListener("click", handlePostActions);
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
@@ -881,6 +1071,7 @@
           await saveUserToDb(cu);
           renderProfile(cu);
           renderVideos();
+          renderPosts();
         } catch (error) {
           console.error(error);
           showAuthStatus("Failed to load profile.", false);
