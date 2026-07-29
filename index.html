@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile App</title>
+  <title>AuthHub</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -16,19 +17,83 @@
       background: #0f172a;
       color: #fff;
       min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light-mode {
+      background: #f8fafc;
+      color: #111827;
     }
 
     .hidden {
       display: none !important;
     }
 
+    .tab-active {
+      border-bottom: 3px solid #f59e0b !important;
+      color: #f59e0b !important;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      border-radius: 12px;
+      color: #fff;
+      padding: 10px 14px;
+      width: 100%;
+      outline: none;
+      font-size: 14px;
+    }
+
+    body.light-mode input,
+    body.light-mode select,
+    body.light-mode textarea {
+      background: #fff;
+      color: #111827;
+      border-color: #d1d5db;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #f59e0b;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #a1a1aa;
+      margin-bottom: 6px;
+    }
+
+    body.light-mode label {
+      color: #374151;
+    }
+
     .btn {
       border: none;
       border-radius: 12px;
-      padding: 10px 16px;
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
+      padding: 11px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: opacity 0.15s;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .btn-orange {
@@ -51,68 +116,46 @@
       color: #000;
     }
 
-    .section-box {
-      background: #18181b;
-      border-radius: 18px;
-      padding: 20px;
-      border: 1px solid #27272a;
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid #3f3f46;
+      color: inherit;
+      border-radius: 12px;
+      padding: 11px 18px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
     }
 
-    .profile-cover {
-      height: 220px;
-      background: linear-gradient(135deg, #1d4ed8, #38bdf8);
-      background-size: cover;
-      background-position: center;
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .status-bar {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-top: 12px;
+      font-size: 13px;
+      max-width: 90%;
+      word-break: break-word;
+      color: #fff;
+    }
+
+    .rel-pw {
       position: relative;
     }
 
-    .profile-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: 20px;
-      background: #18181b;
-      border-bottom: 1px solid #27272a;
-    }
-
-    .profile-body {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 24px 16px 40px;
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 20px;
-    }
-
-    .profile-photo {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #f59e0b;
-      background: #27272a;
-    }
-
-    .user-info-box {
-      background: #0f172a;
-      border: 1px solid #f59e0b33;
-      border-radius: 14px;
-      padding: 18px;
-      margin-top: 14px;
-      line-height: 2;
-    }
-
-    .upload-group {
-      margin-top: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .upload-group .btn {
-      width: 100%;
+    .pw-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #71717a;
+      font-size: 14px;
     }
 
     .video-grid {
@@ -126,6 +169,19 @@
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid #3f3f46;
+      display: flex;
+      flex-direction: column;
+      transition: .3s;
+    }
+
+    .video-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(245, 158, 11, .3);
+    }
+
+    body.light-mode .video-card {
+      background: #fff;
+      border-color: #d1d5db;
     }
 
     .video-player video,
@@ -133,11 +189,126 @@
       width: 100%;
       height: 180px;
       background: #000;
+      object-fit: cover;
       border: 0;
+      display: block;
     }
 
     .video-info {
       padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+
+    .section-box {
+      background: #18181b;
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid #27272a;
+      transition: .3s;
+    }
+
+    .section-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+    }
+
+    body.light-mode .section-box {
+      background: #ffffff;
+      border-color: #e5e7eb;
+    }
+
+    .upload-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .upload-group .btn {
+      flex: 1 1 160px;
+    }
+
+    .profile-cover {
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      transition: .4s;
+    }
+
+    .profile-cover:hover {
+      filter: brightness(1.08);
+    }
+
+    .profile-cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.35));
+      pointer-events: none;
+    }
+
+    .profile-cover .cover-actions {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      z-index: 1;
+    }
+
+    .profile-header {
+      background: #18181b;
+      padding: 24px;
+      border-bottom: 1px solid #27272a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    body.light-mode .profile-header {
+      background: #ffffff;
+      border-color: #e5e7eb;
+    }
+
+    .profile-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+
+    .profile-photo {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #f59e0b;
+      background: #27272a;
+      cursor: pointer;
+      transition: .3s;
+    }
+
+    .profile-photo:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 25px #f59e0b;
+    }
+
+    .clickable-photo {
+      display: inline-block;
+      line-height: 0;
     }
 
     .post-box {
@@ -148,28 +319,91 @@
       margin-top: 20px;
     }
 
+    body.light-mode .post-box {
+      background: #ffffff;
+      border-color: #e5e7eb;
+    }
+
     .post-card {
       background: #27272a;
       border: 1px solid #3f3f46;
       border-radius: 14px;
       padding: 16px;
       margin-top: 12px;
+      transition: .3s;
+    }
+
+    .post-card:hover {
+      transform: translateY(-4px);
+      border-color: #f59e0b;
+    }
+
+    body.light-mode .post-card {
+      background: #f9fafb;
+      border-color: #d1d5db;
     }
 
     .post-text {
-      white-space: pre-wrap;
+      font-size: 17px;
       line-height: 1.6;
+      color: inherit;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .post-meta {
+      color: #a1a1aa;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    body.light-mode .post-meta {
+      color: #6b7280;
+    }
+
+    .post-comments {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #3f3f46;
+      color: inherit;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    body.light-mode .post-comments {
+      border-top-color: #d1d5db;
+    }
+
+    .user-info-box {
+      background: #0f172a;
+      border: 1px solid #f59e0b33;
+      border-radius: 14px;
+      padding: 18px;
+      color: #e2e8f0;
+      line-height: 2;
+      font-size: 17px;
+    }
+
+    body.light-mode .user-info-box {
+      background: #f8fafc;
+      color: #111827;
+      border-color: #f59e0b66;
+    }
+
+    .user-info-box strong {
+      color: #f59e0b;
+      font-size: 17px;
     }
 
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      z-index: 9999;
+      background: rgba(0, 0, 0, 0.75);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      z-index: 10000;
     }
 
     .modal-content {
@@ -178,18 +412,13 @@
       background: #18181b;
       border: 1px solid #27272a;
       border-radius: 18px;
-      padding: 18px;
-      position: fixed;
-      top: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      cursor: grab;
-      user-select: none;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
 
-    .modal-content.dragging {
-      cursor: grabbing;
-      opacity: 0.95;
+    body.light-mode .modal-content {
+      background: #ffffff;
+      border-color: #e5e7eb;
     }
 
     .calc-display {
@@ -203,7 +432,11 @@
       background: #0f172a;
       color: #fff;
       overflow-x: auto;
-      user-select: text;
+    }
+
+    body.light-mode .calc-display {
+      background: #f3f4f6;
+      color: #111827;
     }
 
     .calc-grid {
@@ -223,6 +456,10 @@
       font-weight: 700;
     }
 
+    .calc-grid button:hover {
+      opacity: 0.88;
+    }
+
     .calc-grid .calc-orange {
       background: #f59e0b;
       color: #000;
@@ -232,218 +469,855 @@
       background: #ef4444;
     }
 
-    @media (max-width: 768px) {
-      .profile-body {
+    .calc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    @media (max-width: 700px) {
+      .video-grid {
         grid-template-columns: 1fr;
       }
 
-      .modal-content {
-        width: calc(100% - 24px);
-        max-width: none;
+      .profile-body {
+        grid-template-columns: 1fr !important;
+      }
+
+      .signup-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .span-2 {
+        grid-column: auto !important;
       }
     }
   </style>
 </head>
 <body>
+  <div id="app">
+    <div style="position:fixed;top:16px;right:16px;z-index:99999;display:flex;gap:10px;flex-wrap:wrap;">
+      <button id="theme-toggle" class="btn btn-ghost">Toggle White/Black</button>
+      <button id="open-calculator-btn" class="btn btn-orange">Open Calculator</button>
+    </div>
 
-  <!-- PROFILE SECTION -->
-  <div id="profile-wrap">
-    <div class="profile-cover" id="cover-bg"></div>
-
-    <div class="profile-header">
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <img id="p-photo" class="profile-photo" src="https://via.placeholder.com/110" alt="Profile Photo">
-        <div>
-          <h2 id="p-name">User Name</h2>
-          <p id="p-username-tag">@username</p>
+    <div id="auth-wrap" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f172a,#18181b)">
+      <div style="width:100%;max-width:480px;background:#18181b;border-radius:24px;border:1px solid #f59e0b33;overflow:hidden;">
+        <div style="padding:32px 32px 24px;text-align:center;border-bottom:1px solid #27272a;">
+          <h1 style="font-size:24px;color:#f59e0b;font-weight:700;">AuthHub</h1>
+          <p style="color:#71717a;font-size:13px;margin-top:6px;">Login or create your personal profile</p>
         </div>
-      </div>
 
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button type="button" class="btn btn-orange" id="open-calculator-btn">Calculator</button>
-        <button type="button" class="btn btn-gray" id="edit-profile-btn">Edit Profile</button>
+        <div style="display:flex;border-bottom:1px solid #27272a;">
+          <button type="button" id="tab-login" class="tab-active" style="flex:1;padding:14px;background:none;border:none;color:inherit;font-size:13px;cursor:pointer;">Login</button>
+          <button type="button" id="tab-signup" style="flex:1;padding:14px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;">Sign Up</button>
+        </div>
+
+        <div style="padding:28px;">
+          <div id="login-form">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div>
+                <label for="l-email">Email</label>
+                <input id="l-email" type="email" placeholder="Enter email" autocomplete="email" />
+              </div>
+
+              <div>
+                <label for="l-pass">Password</label>
+                <div class="rel-pw">
+                  <input id="l-pass" type="password" placeholder="Enter password" autocomplete="current-password" />
+                  <button type="button" class="pw-eye" id="l-eye">👁</button>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-orange" id="login-btn" style="width:100%;justify-content:center;">Sign In</button>
+            </div>
+
+            <p style="text-align:center;margin-top:16px;font-size:13px;color:#71717a;">
+              Don't have an account?
+              <span id="go-signup" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign up</span>
+            </p>
+          </div>
+
+          <div id="signup-form" class="hidden">
+            <div class="signup-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><label for="s-user">Username</label><input id="s-user" placeholder="Choose username" /></div>
+              <div><label for="s-name">Full Name</label><input id="s-name" placeholder="Your name" /></div>
+              <div><label for="s-email">Email</label><input id="s-email" type="email" placeholder="you@email.com" autocomplete="email" /></div>
+              <div><label for="s-phone">Phone</label><input id="s-phone" type="tel" placeholder="+63 9XX XXX XXX" /></div>
+
+              <div>
+                <label for="s-pass">Password</label>
+                <div class="rel-pw">
+                  <input id="s-pass" type="password" placeholder="Min 6 chars" autocomplete="new-password" />
+                  <button type="button" class="pw-eye" id="s-eye">👁</button>
+                </div>
+              </div>
+
+              <div><label for="s-age">Age</label><input id="s-age" type="number" placeholder="Age" /></div>
+
+              <div>
+                <label for="s-gender">Gender</label>
+                <select id="s-gender">
+                  <option value="">Select</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Prefer not to say</option>
+                </select>
+              </div>
+
+              <div><label for="s-bday">Birthday</label><input id="s-bday" type="date" /></div>
+              <div class="span-2" style="grid-column:span 2"><label for="s-addr">Address</label><input id="s-addr" placeholder="Your address" /></div>
+              <div class="span-2" style="grid-column:span 2"><label for="s-bio">Bio</label><textarea id="s-bio" rows="2" placeholder="Tell something about yourself"></textarea></div>
+
+              <div class="span-2" style="grid-column:span 2">
+                <button type="button" class="btn btn-orange" id="signup-btn" style="width:100%;justify-content:center;">Create Account</button>
+              </div>
+            </div>
+
+            <p style="text-align:center;margin-top:14px;font-size:13px;color:#71717a;">
+              Already have an account?
+              <span id="go-login" style="color:#f59e0b;cursor:pointer;font-weight:600;">Sign in</span>
+            </p>
+          </div>
+
+          <div id="auth-status"></div>
+        </div>
       </div>
     </div>
 
-    <div class="profile-body">
-      <!-- LEFT SIDE -->
-      <div class="section-box">
-        <h3>User Information</h3>
-
-        <div class="user-info-box" id="user-info">
-          <div><strong>Email:</strong> example@email.com</div>
-          <div><strong>Phone:</strong> 123456789</div>
-          <div><strong>Age:</strong> 20</div>
-          <div><strong>Gender:</strong> Male</div>
-          <div><strong>Birthday:</strong> 2004-01-01</div>
-          <div><strong>Address:</strong> Sample Address</div>
-        </div>
-
-        <div class="upload-group">
-          <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
-          <input type="file" id="photo-upload-input" accept="image/*" class="hidden" />
+    <div id="profile-wrap" class="hidden" style="background:#09090b;min-height:100vh;">
+      <div id="cover-bg" class="profile-cover">
+        <div class="cover-actions">
+          <button type="button" class="btn btn-orange" id="cover-btn">Change Cover</button>
+          <input type="file" id="cover-upload-input" accept="image/*" class="hidden" />
         </div>
       </div>
 
-      <!-- RIGHT SIDE -->
-      <div>
+      <div class="profile-header">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <a id="photo-link" href="#" target="_blank" class="clickable-photo">
+            <img id="p-photo" class="profile-photo" src="" alt="Profile photo" />
+          </a>
+          <div>
+            <h2 id="p-name" style="font-size:22px;font-weight:700;"></h2>
+            <p id="p-username-tag" style="color:#71717a;font-size:14px;"></p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-orange" id="open-calculator-btn-profile">Calculator</button>
+          <button type="button" class="btn btn-gray" id="edit-profile-btn">Edit Profile</button>
+          <button type="button" class="btn btn-ghost" id="logout-btn">Log Out</button>
+        </div>
+      </div>
+
+      <div class="profile-body">
         <div class="section-box">
-          <h3>My Videos</h3>
-          <div id="video-grid" class="video-grid" style="margin-top:16px;"></div>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile</h3>
+          <p id="p-bio" style="color:#a1a1aa;font-size:14px;font-style:italic;margin-bottom:14px;">No bio added</p>
+
+          <div class="upload-group">
+            <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
+            <input type="file" id="photo-upload-input" accept="image/*" class="hidden" />
+          </div>
+
+          <div class="upload-group">
+            <button type="button" class="btn btn-orange" id="set-photo-url-btn">Set Photo URL</button>
+            <button type="button" class="btn btn-gray" id="set-cover-url-btn">Set Cover URL</button>
+          </div>
+
+          <div class="upload-group">
+            <input type="text" id="video-link" placeholder="Paste YouTube URL or direct video URL" />
+            <button type="button" id="add-video-link" class="btn btn-gray">Add Video Link</button>
+          </div>
+
+          <div class="upload-group">
+            <button type="button" class="btn btn-orange" id="video-btn">Upload Video File</button>
+            <input type="file" id="video-upload-input" accept="video/*" class="hidden" />
+          </div>
+
+          <div style="margin-top:18px;">
+            <h4 style="margin-bottom:10px;">User Information</h4>
+            <div class="user-info-box" id="user-info"></div>
+          </div>
         </div>
 
-        <div class="post-box">
-          <h3>Posts & Comments</h3>
-          <textarea id="post-text" rows="3" placeholder="Write a post..." style="width:100%;margin-top:12px;padding:12px;border-radius:12px;border:1px solid #3f3f46;background:#27272a;color:#fff;"></textarea>
-          <button type="button" class="btn btn-orange" id="add-post-btn" style="margin-top:10px;">Add Post</button>
-          <div id="posts-list" style="margin-top:16px;"></div>
+        <div>
+          <div class="section-box">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">My Videos</h3>
+            <div id="video-grid" class="video-grid"></div>
+            <div id="no-videos" style="text-align:center;padding:40px 20px;color:#71717a;display:none;">
+              No videos yet. Add or upload your first video!
+            </div>
+          </div>
+
+          <div class="post-box">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Posts & Comments</h3>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <textarea id="post-text" rows="3" placeholder="Write a post..."></textarea>
+              <button type="button" class="btn btn-orange" id="add-post-btn">Add Post</button>
+            </div>
+
+            <div id="posts-list" style="margin-top:16px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="prof-status" style="text-align:center;padding:0 0 20px;"></div>
+
+      <div id="edit-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999;">
+        <div style="width:100%;max-width:560px;background:#18181b;border:1px solid #27272a;border-radius:20px;padding:20px;">
+          <h3 style="margin-bottom:14px;">Edit Profile</h3>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label>Full Name</label><input id="edit-name" /></div>
+            <div><label>Username</label><input id="edit-username" /></div>
+            <div><label>Phone</label><input id="edit-phone" /></div>
+            <div><label>Age</label><input id="edit-age" type="number" /></div>
+            <div><label>Gender</label><input id="edit-gender" /></div>
+            <div><label>Birthday</label><input id="edit-birthday" type="date" /></div>
+            <div style="grid-column:span 2;"><label>Address</label><input id="edit-address" /></div>
+            <div style="grid-column:span 2;"><label>Bio</label><textarea id="edit-bio" rows="3"></textarea></div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-gray" id="cancel-edit-btn">Cancel</button>
+            <button type="button" class="btn btn-orange" id="save-edit-btn">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="calculator-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="calc-top">
+          <h3 style="font-size:18px;">Calculator</h3>
+          <button id="close-calculator-btn" class="btn btn-red" style="padding:8px 12px;">Close</button>
+        </div>
+
+        <div id="calc-display" class="calc-display">0</div>
+
+        <div class="calc-grid">
+          <button data-calc="C" class="calc-red">C</button>
+          <button data-calc="⌫">⌫</button>
+          <button data-calc="/">÷</button>
+          <button data-calc="*">×</button>
+
+          <button data-calc="7">7</button>
+          <button data-calc="8">8</button>
+          <button data-calc="9">9</button>
+          <button data-calc="-">−</button>
+
+          <button data-calc="4">4</button>
+          <button data-calc="5">5</button>
+          <button data-calc="6">6</button>
+          <button data-calc="+">+</button>
+
+          <button data-calc="1">1</button>
+          <button data-calc="2">2</button>
+          <button data-calc="3">3</button>
+          <button data-calc="=" class="calc-orange">=</button>
+
+          <button data-calc="0" style="grid-column: span 2;">0</button>
+          <button data-calc=".">.</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- DRAGGABLE CALCULATOR -->
-  <div id="calculator-modal" class="modal hidden">
-    <div id="calculator-window" class="modal-content">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;">
-        <h3>Calculator</h3>
-        <button id="close-calculator-btn" class="btn btn-red">Close</button>
-      </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
-      <div id="calc-display" class="calc-display">0</div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
+      authDomain: "reyliveserver-73cba.firebaseapp.com",
+      projectId: "reyliveserver-73cba",
+      storageBucket: "reyliveserver-73cba.firebasestorage.app",
+      messagingSenderId: "220200732080",
+      appId: "1:220200732080:web:463bceaa7189f7ad3b4275"
+    };
 
-      <div class="calc-grid">
-        <button data-calc="C" class="calc-red">C</button>
-        <button data-calc="⌫">⌫</button>
-        <button data-calc="/">÷</button>
-        <button data-calc="*">×</button>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-        <button data-calc="7">7</button>
-        <button data-calc="8">8</button>
-        <button data-calc="9">9</button>
-        <button data-calc="-">−</button>
+    let cu = null;
+    const $ = (id) => document.getElementById(id);
+    const state = { calcValue: "0" };
 
-        <button data-calc="4">4</button>
-        <button data-calc="5">5</button>
-        <button data-calc="6">6</button>
-        <button data-calc="+">+</button>
+    const PROFILE_PLACEHOLDER =
+      "data:image/svg+xml;charset=UTF-8," +
+      encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+          <rect width="200" height="200" rx="100" fill="#27272a"/>
+          <circle cx="100" cy="78" r="34" fill="#71717a"/>
+          <path d="M40 170c10-31 38-50 60-50s50 19 60 50" fill="#71717a"/>
+        </svg>
+      `);
 
-        <button data-calc="1">1</button>
-        <button data-calc="2">2</button>
-        <button data-calc="3">3</button>
-        <button data-calc="=" class="calc-orange">=</button>
-
-        <button data-calc="0" style="grid-column: span 2;">0</button>
-        <button data-calc=".">.</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const calcModal = document.getElementById("calculator-modal");
-    const calcWindow = document.getElementById("calculator-window");
-    const calcDisplay = document.getElementById("calc-display");
-    const calcGrid = document.querySelector(".calc-grid");
-    const photoBtn = document.getElementById("photo-btn");
-    const photoInput = document.getElementById("photo-upload-input");
-    const profilePhoto = document.getElementById("p-photo");
-
-    let calcValue = "0";
-
-    document.getElementById("open-calculator-btn").addEventListener("click", () => {
-      calcModal.classList.remove("hidden");
-    });
-
-    document.getElementById("close-calculator-btn").addEventListener("click", () => {
-      calcModal.classList.add("hidden");
-    });
-
-    calcModal.addEventListener("click", (e) => {
-      if (e.target === calcModal) {
-        calcModal.classList.add("hidden");
-      }
-    });
-
-    function updateCalc() {
-      calcDisplay.textContent = calcValue;
+    function setStatus(elId, msg, ok) {
+      const el = $(elId);
+      if (!el) return;
+      el.innerHTML = "";
+      const div = document.createElement("div");
+      div.className = "status-bar";
+      div.style.background = ok ? "#14532d" : "#7f1d1d";
+      div.textContent = msg;
+      el.appendChild(div);
     }
 
-    function solve(expr) {
+    const showAuthStatus = (msg, ok) => setStatus("auth-status", msg, ok);
+    const showProfStatus = (msg, ok) => setStatus("prof-status", msg, ok);
+
+    function defaultUser(uid, email, displayName) {
+      return {
+        uid,
+        email,
+        name: displayName || "User",
+        username: email?.split("@")[0] || "user",
+        phone: "",
+        age: "",
+        gender: "",
+        birthday: "",
+        address: "",
+        bio: "",
+        photoUrl: "",
+        coverUrl: "",
+        videos: [],
+        posts: [],
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    async function saveUserToDb(userData) {
+      if (!userData?.uid) throw new Error("Missing user UID");
+      await setDoc(doc(db, "users", userData.uid), userData, { merge: true });
+    }
+
+    async function loadUserFromDb(uid) {
+      const snap = await getDoc(doc(db, "users", uid));
+      return snap.exists() ? snap.data() : null;
+    }
+
+    function switchTab(t) {
+      $("login-form").classList.toggle("hidden", t !== 0);
+      $("signup-form").classList.toggle("hidden", t !== 1);
+      $("tab-login").classList.toggle("tab-active", t === 0);
+      $("tab-signup").classList.toggle("tab-active", t === 1);
+      $("tab-login").style.color = t === 0 ? "#f59e0b" : "#71717a";
+      $("tab-signup").style.color = t === 1 ? "#f59e0b" : "#71717a";
+      $("auth-status").innerHTML = "";
+    }
+
+    function setLoading(buttonId, isLoading, text, originalText) {
+      const btn = $(buttonId);
+      if (!btn) return;
+      btn.disabled = isLoading;
+      btn.textContent = isLoading ? text : originalText;
+    }
+
+    function normalizeUserData(profile, user) {
+      const base = defaultUser(user.uid, user.email, user.displayName);
+      return {
+        ...base,
+        ...(profile || {}),
+        uid: user.uid,
+        email: user.email || profile?.email || "",
+        name: profile?.name || user.displayName || base.name,
+        username: profile?.username || base.username,
+        videos: Array.isArray(profile?.videos) ? profile.videos : [],
+        posts: Array.isArray(profile?.posts) ? profile.posts : []
+      };
+    }
+
+    function renderProfile(user) {
+      $("auth-wrap").classList.add("hidden");
+      $("profile-wrap").classList.remove("hidden");
+
+      $("p-name").textContent = user?.name || user?.username || "User";
+      $("p-username-tag").textContent = user?.username ? `@${user.username}` : "";
+      $("p-bio").textContent = user?.bio || "No bio added";
+
+      $("p-photo").src = user?.photoUrl || PROFILE_PLACEHOLDER;
+      $("photo-link").href = user?.photoUrl || PROFILE_PLACEHOLDER;
+
+      const cover = $("cover-bg");
+      cover.style.backgroundImage = user?.coverUrl ? `url("${user.coverUrl}")` : "none";
+      cover.style.backgroundColor = user?.coverUrl ? "transparent" : "";
+      cover.style.background = user?.coverUrl ? `url("${user.coverUrl}") center/cover no-repeat` : "linear-gradient(135deg,#1d4ed8,#38bdf8)";
+
+      $("user-info").innerHTML = `
+        <div><strong>Email:</strong> ${user.email || "N/A"}</div>
+        <div><strong>Phone:</strong> ${user.phone || "N/A"}</div>
+        <div><strong>Age:</strong> ${user.age || "N/A"}</div>
+        <div><strong>Gender:</strong> ${user.gender || "N/A"}</div>
+        <div><strong>Birthday:</strong> ${user.birthday || "N/A"}</div>
+        <div><strong>Address:</strong> ${user.address || "N/A"}</div>
+      `;
+    }
+
+    function renderVideos() {
+      const container = $("video-grid");
+      const noVideos = $("no-videos");
+      if (!container || !noVideos) return;
+
+      container.innerHTML = "";
+      const videos = Array.isArray(cu?.videos) ? cu.videos : [];
+
+      if (!videos.length) {
+        noVideos.style.display = "block";
+        return;
+      }
+
+      noVideos.style.display = "none";
+
+      videos.forEach((video, index) => {
+        const card = document.createElement("div");
+        card.className = "video-card";
+
+        const mediaHtml =
+          video?.type === "youtube" && video?.embedUrl
+            ? `<iframe src="${video.embedUrl}" allowfullscreen></iframe>`
+            : video?.url
+              ? `<video src="${video.url}" controls preload="metadata"></video>`
+              : "";
+
+        card.innerHTML = `
+          <div class="video-player">${mediaHtml}</div>
+          <div class="video-info">
+            <div style="font-size:14px;font-weight:600;word-break:break-word;">${video?.title || "Untitled Video"}</div>
+            <div style="font-size:12px;color:#71717a;">${video?.addedAt ? new Date(video.addedAt).toLocaleDateString() : ""}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" data-action="delete-video" data-index="${index}" class="btn btn-red" style="padding:6px 12px;font-size:12px;">Delete</button>
+              <button type="button" data-action="rename-video" data-index="${index}" class="btn btn-gray" style="padding:6px 12px;font-size:12px;">Rename</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderPosts() {
+      const list = $("posts-list");
+      if (!list) return;
+      list.innerHTML = "";
+      const posts = Array.isArray(cu?.posts) ? cu.posts : [];
+
+      if (!posts.length) {
+        list.innerHTML = `<div style="color:#71717a;font-size:13px;">No posts yet.</div>`;
+        return;
+      }
+
+      posts.slice().reverse().forEach((post, index) => {
+        const actualIndex = posts.length - 1 - index;
+        const likes = post.likes || 0;
+        const comments = Array.isArray(post.comments) ? post.comments : [];
+
+        const div = document.createElement("div");
+        div.className = "post-card";
+        div.innerHTML = `
+          <div class="post-text"></div>
+          <div class="post-meta">${post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}</div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-green" data-post-action="like" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
+              Like (${likes})
+            </button>
+            <button type="button" class="btn btn-gray" data-post-action="comment" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
+              Comment (${comments.length})
+            </button>
+            <button type="button" class="btn btn-red" data-post-action="delete" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
+              Delete
+            </button>
+          </div>
+          ${comments.length ? `
+            <div class="post-comments">
+              <strong style="color:#f59e0b;">Comments:</strong>
+              <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+                ${comments.map(c => `<div>• ${c}</div>`).join("")}
+              </div>
+            </div>
+          ` : ""}
+        `;
+        div.querySelector(".post-text").textContent = post.text || "";
+        list.appendChild(div);
+      });
+    }
+
+    async function persistUser(userData) {
+      cu = userData;
+      await saveUserToDb(userData);
+      renderProfile(userData);
+      renderVideos();
+      renderPosts();
+    }
+
+    async function uploadMedia(file, folder) {
+      if (!cu?.uid) throw new Error("No logged in user");
+      if (!file) throw new Error("No file selected");
+
+      const isImage = file.type.startsWith("image/");
+      const isVideo = file.type.startsWith("video/");
+
+      if (folder === "videos" && !isVideo) throw new Error("Please select a valid video file.");
+      if (folder !== "videos" && !isImage) throw new Error("Please select a valid image file.");
+
+      const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+      const fileRef = ref(storage, `${folder}/${cu.uid}/${Date.now()}-${safeName}`);
+
+      await uploadBytes(fileRef, file);
+      return await getDownloadURL(fileRef);
+    }
+
+    async function doSignup() {
+      const email = $("s-email").value.trim();
+      const password = $("s-pass").value.trim();
+      const username = $("s-user").value.trim();
+      const name = $("s-name").value.trim();
+
+      if (!email || !password || !username || !name) return showAuthStatus("Please fill in required fields.", false);
+      if (password.length < 6) return showAuthStatus("Password must be at least 6 characters.", false);
+
+      try {
+        setLoading("signup-btn", true, "Creating...", "Create Account");
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: name });
+
+        const userData = defaultUser(cred.user.uid, email, name);
+        userData.username = username;
+        userData.phone = $("s-phone").value.trim();
+        userData.age = $("s-age").value.trim();
+        userData.gender = $("s-gender").value;
+        userData.birthday = $("s-bday").value;
+        userData.address = $("s-addr").value.trim();
+        userData.bio = $("s-bio").value.trim();
+
+        await persistUser(userData);
+        showAuthStatus("Account created successfully.", true);
+      } catch (err) {
+        showAuthStatus(err.message, false);
+      } finally {
+        setLoading("signup-btn", false, "Creating...", "Create Account");
+      }
+    }
+
+    async function doLogin() {
+      const email = $("l-email").value.trim();
+      const password = $("l-pass").value.trim();
+      if (!email || !password) return showAuthStatus("Enter email and password.", false);
+
+      try {
+        setLoading("login-btn", true, "Signing In...", "Sign In");
+        await signInWithEmailAndPassword(auth, email, password);
+        showAuthStatus("Login successful.", true);
+      } catch (err) {
+        showAuthStatus(err.message, false);
+      } finally {
+        setLoading("login-btn", false, "Signing In...", "Sign In");
+      }
+    }
+
+    async function doLogout() {
+      await signOut(auth);
+      cu = null;
+      $("profile-wrap").classList.add("hidden");
+      $("auth-wrap").classList.remove("hidden");
+    }
+
+    async function addVideoLink() {
+      const url = $("video-link").value.trim();
+      if (!url) return showProfStatus("Paste a video URL first.", false);
+
+      let video = { title: "Video Link", addedAt: new Date().toISOString() };
+      if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        const id = url.includes("youtu.be")
+          ? url.split("/").pop().split("?")[0]
+          : new URL(url).searchParams.get("v");
+        if (!id) return showProfStatus("Invalid YouTube URL.", false);
+        video.type = "youtube";
+        video.embedUrl = `https://www.youtube.com/embed/${id}`;
+      } else {
+        video.type = "direct";
+        video.url = url;
+      }
+
+      cu.videos = [...(cu.videos || []), video];
+      await persistUser(cu);
+      $("video-link").value = "";
+      showProfStatus("Video added.", true);
+    }
+
+    async function uploadPhoto() {
+      $("photo-upload-input").click();
+    }
+
+    async function uploadCover() {
+      $("cover-upload-input").click();
+    }
+
+    async function uploadVideoFile() {
+      $("video-upload-input").click();
+    }
+
+    async function handlePhotoFile(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const url = await uploadMedia(file, "photos");
+        cu.photoUrl = url;
+        await persistUser(cu);
+        showProfStatus("Photo updated.", true);
+      } catch (err) {
+        showProfStatus(err.message, false);
+      } finally {
+        e.target.value = "";
+      }
+    }
+
+    async function handleCoverFile(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const url = await uploadMedia(file, "covers");
+        cu.coverUrl = url;
+        await persistUser(cu);
+        showProfStatus("Cover updated.", true);
+      } catch (err) {
+        showProfStatus(err.message, false);
+      } finally {
+        e.target.value = "";
+      }
+    }
+
+    async function handleVideoFile(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const url = await uploadMedia(file, "videos");
+        cu.videos = [...(cu.videos || []), { type: "file", url, title: file.name, addedAt: new Date().toISOString() }];
+        await persistUser(cu);
+        showProfStatus("Video uploaded.", true);
+      } catch (err) {
+        showProfStatus(err.message, false);
+      } finally {
+        e.target.value = "";
+      }
+    }
+
+    async function deleteVideo(index) {
+      cu.videos.splice(index, 1);
+      await persistUser(cu);
+      showProfStatus("Video deleted.", true);
+    }
+
+    async function renameVideo(index) {
+      const current = cu.videos[index]?.title || "";
+      const next = prompt("Enter new video title:", current);
+      if (!next) return;
+      cu.videos[index].title = next.trim();
+      await persistUser(cu);
+      showProfStatus("Video renamed.", true);
+    }
+
+    async function addPost() {
+      const text = $("post-text").value.trim();
+      if (!text) return showProfStatus("Write something before posting.", false);
+
+      cu.posts = [...(cu.posts || []), { text, likes: 0, comments: [], createdAt: new Date().toISOString() }];
+      await persistUser(cu);
+      $("post-text").value = "";
+      showProfStatus("Post added.", true);
+    }
+
+    async function handlePostActions(e) {
+      const btn = e.target.closest("button[data-post-action]");
+      if (!btn) return;
+      const index = Number(btn.dataset.index);
+      const action = btn.dataset.postAction;
+      const post = cu.posts[index];
+      if (!post) return;
+
+      if (action === "like") post.likes = (post.likes || 0) + 1;
+      if (action === "comment") {
+        const comment = prompt("Add a comment:");
+        if (comment?.trim()) post.comments = [...(post.comments || []), comment.trim()];
+      }
+      if (action === "delete") cu.posts.splice(index, 1);
+
+      await persistUser(cu);
+    }
+
+    function openEditModal() {
+      $("edit-name").value = cu?.name || "";
+      $("edit-username").value = cu?.username || "";
+      $("edit-phone").value = cu?.phone || "";
+      $("edit-age").value = cu?.age || "";
+      $("edit-gender").value = cu?.gender || "";
+      $("edit-birthday").value = cu?.birthday || "";
+      $("edit-address").value = cu?.address || "";
+      $("edit-bio").value = cu?.bio || "";
+      $("edit-modal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      $("edit-modal").classList.add("hidden");
+    }
+
+    async function saveEditProfile() {
+      cu.name = $("edit-name").value.trim();
+      cu.username = $("edit-username").value.trim();
+      cu.phone = $("edit-phone").value.trim();
+      cu.age = $("edit-age").value.trim();
+      cu.gender = $("edit-gender").value.trim();
+      cu.birthday = $("edit-birthday").value;
+      cu.address = $("edit-address").value.trim();
+      cu.bio = $("edit-bio").value.trim();
+      await persistUser(cu);
+      closeEditModal();
+      showProfStatus("Profile updated.", true);
+    }
+
+    function setUrl(type) {
+      const url = prompt(`Enter ${type} URL:`);
+      if (!url) return;
+      if (type === "photo") cu.photoUrl = url.trim();
+      if (type === "cover") cu.coverUrl = url.trim();
+      persistUser(cu).then(() => showProfStatus(`${type} URL updated.`, true));
+    }
+
+    function openCalculator() {
+      $("calculator-modal").classList.remove("hidden");
+    }
+
+    function closeCalculator() {
+      $("calculator-modal").classList.add("hidden");
+    }
+
+    function updateCalculatorDisplay() {
+      $("calc-display").textContent = state.calcValue;
+    }
+
+    function calculateExpression(expr) {
       try {
         if (!/^[0-9+\-*/.() ]+$/.test(expr)) return "Error";
         const result = Function(`"use strict"; return (${expr})`)();
-        return Number.isFinite(result) ? String(result) : "Error";
+        return String(result);
       } catch {
         return "Error";
       }
     }
 
-    calcGrid.addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-calc]");
-      if (!btn) return;
-
-      const val = btn.dataset.calc;
-
-      if (val === "C") {
-        calcValue = "0";
-      } else if (val === "⌫") {
-        calcValue = calcValue.length > 1 ? calcValue.slice(0, -1) : "0";
-      } else if (val === "=") {
-        calcValue = solve(calcValue);
+    function handleCalculatorButton(value) {
+      if (value === "C") {
+        state.calcValue = "0";
+      } else if (value === "⌫") {
+        state.calcValue = state.calcValue.length > 1 ? state.calcValue.slice(0, -1) : "0";
+      } else if (value === "=") {
+        state.calcValue = calculateExpression(state.calcValue);
       } else {
-        if (calcValue === "0" || calcValue === "Error") {
-          calcValue = val;
+        if (state.calcValue === "0" || state.calcValue === "Error") {
+          state.calcValue = value;
         } else {
-          calcValue += val;
+          state.calcValue += value;
         }
       }
+      updateCalculatorDisplay();
+    }
 
-      updateCalc();
+    $("theme-toggle").addEventListener("click", () => document.body.classList.toggle("light-mode"));
+    $("tab-login").addEventListener("click", () => switchTab(0));
+    $("tab-signup").addEventListener("click", () => switchTab(1));
+    $("go-signup").addEventListener("click", () => switchTab(1));
+    $("go-login").addEventListener("click", () => switchTab(0));
+    $("l-eye").addEventListener("click", () => togglePw("l-pass", "l-eye"));
+    $("s-eye").addEventListener("click", () => togglePw("s-pass", "s-eye"));
+    $("login-btn").addEventListener("click", doLogin);
+    $("signup-btn").addEventListener("click", doSignup);
+    $("logout-btn").addEventListener("click", doLogout);
+    $("add-video-link").addEventListener("click", addVideoLink);
+    $("photo-btn").addEventListener("click", uploadPhoto);
+    $("cover-btn").addEventListener("click", uploadCover);
+    $("video-btn").addEventListener("click", uploadVideoFile);
+    $("photo-upload-input").addEventListener("change", handlePhotoFile);
+    $("cover-upload-input").addEventListener("change", handleCoverFile);
+    $("video-upload-input").addEventListener("change", handleVideoFile);
+    $("add-post-btn").addEventListener("click", addPost);
+    $("edit-profile-btn").addEventListener("click", openEditModal);
+    $("cancel-edit-btn").addEventListener("click", closeEditModal);
+    $("save-edit-btn").addEventListener("click", saveEditProfile);
+    $("set-photo-url-btn").addEventListener("click", () => setUrl("photo"));
+    $("set-cover-url-btn").addEventListener("click", () => setUrl("cover"));
+    $("open-calculator-btn").addEventListener("click", openCalculator);
+    $("open-calculator-btn-profile").addEventListener("click", openCalculator);
+    $("close-calculator-btn").addEventListener("click", closeCalculator);
+
+    $("calculator-modal").addEventListener("click", (e) => {
+      if (e.target.id === "calculator-modal") closeCalculator();
     });
 
-    // Drag support
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    calcWindow.addEventListener("mousedown", (e) => {
-      if (e.target.closest("button")) return;
-      isDragging = true;
-      calcWindow.classList.add("dragging");
-      const rect = calcWindow.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-      calcWindow.style.transform = "none";
-      calcWindow.style.left = `${rect.left}px`;
-      calcWindow.style.top = `${rect.top}px`;
+    $("edit-modal").addEventListener("click", (e) => {
+      if (e.target.id === "edit-modal") closeEditModal();
     });
 
-    document.addEventListener("mousemove", (e) => {
-      if (!isDragging) return;
-      calcWindow.style.left = `${e.clientX - offsetX}px`;
-      calcWindow.style.top = `${e.clientY - offsetY}px`;
+    $("video-grid").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const index = Number(btn.dataset.index);
+      if (btn.dataset.action === "delete-video") deleteVideo(index);
+      if (btn.dataset.action === "rename-video") renameVideo(index);
     });
 
-    document.addEventListener("mouseup", () => {
-      isDragging = false;
-      calcWindow.classList.remove("dragging");
+    $("posts-list").addEventListener("click", handlePostActions);
+
+    document.querySelector(".calc-grid").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-calc]");
+      if (!btn) return;
+      handleCalculatorButton(btn.dataset.calc);
     });
 
-    // Photo upload
-    photoBtn.addEventListener("click", () => photoInput.click());
+    $("open-calculator-btn").addEventListener("dblclick", openCalculator);
 
-    photoInput.addEventListener("change", () => {
-      const file = photoInput.files[0];
-      if (!file) return;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        cu = null;
+        $("auth-wrap").classList.remove("hidden");
+        $("profile-wrap").classList.add("hidden");
+        return;
+      }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        profilePhoto.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      const profile = await loadUserFromDb(user.uid);
+      cu = normalizeUserData(profile, user);
+      await saveUserToDb(cu);
+      renderProfile(cu);
+      renderVideos();
+      renderPosts();
     });
 
-    updateCalc();
+    switchTab(0);
+    updateCalculatorDisplay();
   </script>
 </body>
 </html>
