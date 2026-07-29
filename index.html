@@ -378,9 +378,10 @@
       background: #0f172a;
       border: 1px solid #f59e0b33;
       border-radius: 14px;
-      padding: 14px;
+      padding: 18px;
       color: #e2e8f0;
-      line-height: 1.8;
+      line-height: 2;
+      font-size: 17px; /* Bigger information text */
     }
 
     body.light-mode .user-info-box {
@@ -391,6 +392,90 @@
 
     .user-info-box strong {
       color: #f59e0b;
+      font-size: 17px; /* Bigger information labels */
+    }
+
+    /* Calculator modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10000;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 360px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    body.light-mode .modal-content {
+      background: #ffffff;
+      border-color: #e5e7eb;
+    }
+
+    .calc-display {
+      width: 100%;
+      font-size: 28px;
+      font-weight: bold;
+      text-align: right;
+      padding: 14px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      background: #0f172a;
+      color: #fff;
+      overflow-x: auto;
+    }
+
+    body.light-mode .calc-display {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .calc-grid button {
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      background: #3f3f46;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .calc-grid button:hover {
+      opacity: 0.88;
+    }
+
+    .calc-grid .calc-orange {
+      background: #f59e0b;
+      color: #000;
+    }
+
+    .calc-grid .calc-red {
+      background: #ef4444;
+    }
+
+    .calc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
     }
 
     @media (max-width: 700px) {
@@ -414,8 +499,9 @@
 </head>
 <body>
   <div id="app">
-    <div style="position:fixed;top:16px;right:16px;z-index:99999;">
+    <div style="position:fixed;top:16px;right:16px;z-index:99999;display:flex;gap:10px;flex-wrap:wrap;">
       <button id="theme-toggle" class="btn btn-ghost">Toggle White/Black</button>
+      <button id="open-calculator-btn" class="btn btn-orange">Open Calculator</button>
     </div>
 
     <div id="auth-wrap" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f172a,#18181b)">
@@ -530,7 +616,7 @@
       <div class="profile-body">
         <div class="section-box">
           <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile</h3>
-          <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
+          <p id="p-bio" style="color:#a1a1aa;font-size:14px;font-style:italic;margin-bottom:14px;">No bio added</p>
 
           <div class="upload-group">
             <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
@@ -604,6 +690,43 @@
         </div>
       </div>
     </div>
+
+    <!-- Calculator Modal -->
+    <div id="calculator-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="calc-top">
+          <h3 style="font-size:18px;">Calculator</h3>
+          <button id="close-calculator-btn" class="btn btn-red" style="padding:8px 12px;">Close</button>
+        </div>
+
+        <div id="calc-display" class="calc-display">0</div>
+
+        <div class="calc-grid">
+          <button data-calc="C" class="calc-red">C</button>
+          <button data-calc="⌫">⌫</button>
+          <button data-calc="/">÷</button>
+          <button data-calc="*">×</button>
+
+          <button data-calc="7">7</button>
+          <button data-calc="8">8</button>
+          <button data-calc="9">9</button>
+          <button data-calc="-">−</button>
+
+          <button data-calc="4">4</button>
+          <button data-calc="5">5</button>
+          <button data-calc="6">6</button>
+          <button data-calc="+">+</button>
+
+          <button data-calc="1">1</button>
+          <button data-calc="2">2</button>
+          <button data-calc="3">3</button>
+          <button data-calc="=" class="calc-orange" rowspan="2">=</button>
+
+          <button data-calc="0" style="grid-column: span 2;">0</button>
+          <button data-calc=".">.</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -645,7 +768,7 @@
 
     let cu = null;
     const $ = (id) => document.getElementById(id);
-    const state = { logging: false };
+    const state = { logging: false, calcValue: "0" };
 
     const PROFILE_PLACEHOLDER =
       "data:image/svg+xml;charset=UTF-8," +
@@ -1201,6 +1324,48 @@
       persistUser(cu);
     }
 
+    // Calculator logic
+    function openCalculator() {
+      $("calculator-modal").classList.remove("hidden");
+    }
+
+    function closeCalculator() {
+      $("calculator-modal").classList.add("hidden");
+    }
+
+    function updateCalculatorDisplay() {
+      $("calc-display").textContent = state.calcValue;
+    }
+
+    function calculateExpression(expr) {
+      try {
+        // Safe enough for simple arithmetic calculator use
+        // Only allows numbers/operators used by the calculator buttons
+        if (!/^[0-9+\-*/.() ]+$/.test(expr)) return "Error";
+        const result = Function(`"use strict"; return (${expr})`)();
+        return String(result);
+      } catch {
+        return "Error";
+      }
+    }
+
+    function handleCalculatorButton(value) {
+      if (value === "C") {
+        state.calcValue = "0";
+      } else if (value === "⌫") {
+        state.calcValue = state.calcValue.length > 1 ? state.calcValue.slice(0, -1) : "0";
+      } else if (value === "=") {
+        state.calcValue = calculateExpression(state.calcValue);
+      } else {
+        if (state.calcValue === "0" || state.calcValue === "Error") {
+          state.calcValue = value;
+        } else {
+          state.calcValue += value;
+        }
+      }
+      updateCalculatorDisplay();
+    }
+
     $("tab-login").addEventListener("click", () => switchTab(0));
     $("tab-signup").addEventListener("click", () => switchTab(1));
     $("go-login").addEventListener("click", () => switchTab(0));
@@ -1240,6 +1405,19 @@
       document.body.classList.toggle("light-mode");
     });
 
+    $("open-calculator-btn").addEventListener("click", openCalculator);
+    $("close-calculator-btn").addEventListener("click", closeCalculator);
+
+    $("calculator-modal").addEventListener("click", (e) => {
+      if (e.target.id === "calculator-modal") closeCalculator();
+    });
+
+    document.querySelector(".calc-grid").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-calc]");
+      if (!btn) return;
+      handleCalculatorButton(btn.dataset.calc);
+    });
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
@@ -1261,7 +1439,7 @@
     });
 
     switchTab(0);
+    updateCalculatorDisplay();
   </script>
 </body>
 </html>
- 
