@@ -432,7 +432,7 @@
       apiKey: "AIzaSyBlFrL4HKjIppmELABVISTUMdI9GpQ79kA",
       authDomain: "reyliveserver-73cba.firebaseapp.com",
       projectId: "reyliveserver-73cba",
-      storageBucket: "reyliveserver-73cba.firebasestorage.app",
+      storageBucket: "reyliveserver-73cba.appspot.com",
       messagingSenderId: "220200732080",
       appId: "1:220200732080:web:463bceaa7189f7ad3b4275"
     };
@@ -693,7 +693,7 @@
         renderVideos();
       } catch (error) {
         console.error(error);
-        showAuthStatus("Invalid email or password.", false);
+        showAuthStatus(error.message || "Invalid email or password.", false);
       } finally {
         state.logging = false;
         setLoading("login-btn", false, "Sign In");
@@ -764,7 +764,7 @@
         showProfStatus("Profile photo updated successfully!", true);
       } catch (error) {
         console.error(error);
-        showProfStatus(error.message || "Failed to upload photo.", false);
+        showProfStatus(error.message || "Failed to upload photo. Check Firebase Storage CORS.", false);
       } finally {
         e.target.value = "";
       }
@@ -782,7 +782,7 @@
         showProfStatus("Cover photo updated successfully!", true);
       } catch (error) {
         console.error(error);
-        showProfStatus(error.message || "Failed to upload cover photo.", false);
+        showProfStatus(error.message || "Failed to upload cover photo. Check Firebase Storage CORS.", false);
       } finally {
         e.target.value = "";
       }
@@ -808,7 +808,7 @@
         showProfStatus("Video uploaded successfully!", true);
       } catch (error) {
         console.error(error);
-        showProfStatus(error.message || "Failed to upload video.", false);
+        showProfStatus(error.message || "Failed to upload video. Check Firebase Storage CORS.", false);
       } finally {
         e.target.value = "";
       }
