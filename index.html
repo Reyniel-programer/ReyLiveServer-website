@@ -456,6 +456,8 @@
               <div class="span-2" style="grid-column:span 2"><label for="s-addr">Address</label><input id="s-addr" placeholder="Your address" /></div>
               <div class="span-2" style="grid-column:span 2"><label for="s-bio">Bio</label><textarea id="s-bio" rows="2" placeholder="Tell something about yourself"></textarea></div>
 
+              <div class="span-2" style="grid-column:span 2"><label for="s-introduction">Introduction</label><textarea id="s-introduction" rows="3" placeholder="Short introduction about yourself"></textarea></div>
+
               <div class="span-2" style="grid-column:span 2">
                 <button type="button" class="btn btn-orange" id="signup-btn" style="width:100%;justify-content:center;">Create Account</button>
               </div>
@@ -565,6 +567,7 @@
             <div><label>Birthday</label><input id="edit-birthday" type="date" /></div>
             <div style="grid-column:span 2;"><label>Address</label><input id="edit-address" /></div>
             <div style="grid-column:span 2;"><label>Bio</label><textarea id="edit-bio" rows="3"></textarea></div>
+            <div style="grid-column:span 2;"><label>Introduction</label><textarea id="edit-introduction" rows="4"></textarea></div>
           </div>
 
           <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">
@@ -653,6 +656,7 @@
         birthday: "",
         address: "",
         bio: "",
+        introduction: "",
         photoUrl: "",
         coverUrl: "",
         videos: [],
@@ -706,7 +710,8 @@
         name: profile?.name || user.displayName || base.name,
         username: profile?.username || base.username,
         videos: Array.isArray(profile?.videos) ? profile.videos : [],
-        posts: Array.isArray(profile?.posts) ? profile.posts : []
+        posts: Array.isArray(profile?.posts) ? profile.posts : [],
+        introduction: profile?.introduction || ""
       };
     }
 
@@ -733,6 +738,11 @@
         <div><strong>Gender:</strong> ${user.gender || "N/A"}</div>
         <div><strong>Birthday:</strong> ${user.birthday || "N/A"}</div>
         <div><strong>Address:</strong> ${user.address || "N/A"}</div>
+        <hr style="margin:12px 0;border:1px solid #444;">
+        <div>
+         <strong>Introduction:</strong>
+         <p style="margin-top:8px;">${user.introduction || "No introduction yet."}</p>
+        </div>
       `;
     }
 
@@ -798,19 +808,11 @@
         div.innerHTML = `
           <div class="post-text">${post.text || ""}</div>
           <div class="post-meta">${post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}</div>
-
           <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-            <button type="button" class="btn btn-green" data-post-action="like" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
-              Like (${likes})
-            </button>
-            <button type="button" class="btn btn-gray" data-post-action="comment" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
-              Comment (${comments.length})
-            </button>
-            <button type="button" class="btn btn-red" data-post-action="delete" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">
-              Delete
-            </button>
+            <button type="button" class="btn btn-green" data-post-action="like" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">Like (${likes})</button>
+            <button type="button" class="btn btn-gray" data-post-action="comment" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">Comment (${comments.length})</button>
+            <button type="button" class="btn btn-red" data-post-action="delete" data-index="${actualIndex}" style="padding:8px 12px;font-size:13px;">Delete</button>
           </div>
-
           ${comments.length ? `
             <div class="post-comments">
               <strong style="color:#f59e0b;">Comments:</strong>
@@ -865,6 +867,7 @@
         birthday: $("s-bday").value,
         address: $("s-addr").value.trim(),
         bio: $("s-bio").value.trim(),
+        introduction: $("s-introduction").value.trim(),
         photoUrl: "",
         coverUrl: "",
         videos: [],
@@ -891,6 +894,11 @@
 
         user.uid = cred.user.uid;
         await saveUserToDb(user);
+
+        cu = user;
+        renderProfile(user);
+        renderVideos();
+        renderPosts();
 
         showAuthStatus("Account created successfully.", true);
       } catch (error) {
@@ -1118,14 +1126,6 @@
         showProfStatus("Post deleted.", true);
       }
 
-      if (action === "edit") {
-        const newText = prompt("Edit post:", cu.posts[index].text || "");
-        if (newText === null) return;
-        cu.posts[index].text = newText.trim() || cu.posts[index].text;
-        await persistUser(cu);
-        showProfStatus("Post updated.", true);
-      }
-
       if (action === "like") {
         cu.posts[index].likes = (cu.posts[index].likes || 0) + 1;
         await persistUser(cu);
@@ -1155,6 +1155,7 @@
       $("edit-birthday").value = cu.birthday || "";
       $("edit-address").value = cu.address || "";
       $("edit-bio").value = cu.bio || "";
+      $("edit-introduction").value = cu.introduction || "";
       $("edit-modal").classList.remove("hidden");
     }
 
@@ -1173,6 +1174,7 @@
       cu.birthday = $("edit-birthday").value;
       cu.address = $("edit-address").value.trim();
       cu.bio = $("edit-bio").value.trim();
+      cu.introduction = $("edit-introduction").value.trim();
 
       await persistUser(cu);
       closeEditModal();
