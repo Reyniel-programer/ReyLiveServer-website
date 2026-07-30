@@ -495,11 +495,10 @@
           <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile</h3>
           <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
 
-          <!-- FIXED: put cover photo URL control next to Change Photo -->
           <div class="upload-group">
-            <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
             <button type="button" class="btn btn-orange" id="set-photo-url-btn">Set Photo URL</button>
             <button type="button" class="btn btn-orange" id="set-cover-url-btn">Set Cover Photo URL</button>
+            <button type="button" class="btn btn-gray" id="photo-btn">Upload Photo</button>
             <input type="file" id="photo-upload-input" accept="image/*" class="hidden" />
           </div>
 
@@ -708,7 +707,7 @@
       $("p-bio").textContent = user?.bio || "No bio added";
 
       $("p-photo").src = user?.photoUrl || PROFILE_PLACEHOLDER;
-      $("photo-link").href = user?.photoUrl || PROFILE_PLACEHOLDER;
+      $("photo-link").href = user?.photoUrl || "#";
 
       const cover = $("cover-bg");
       cover.style.backgroundImage = user?.coverUrl
@@ -1125,33 +1124,41 @@
       const url = prompt(`Enter ${type} URL:`, current || "");
       if (!url) return;
 
-      if (type === "photo") cu.photoUrl = url.trim();
-      if (type === "cover") cu.coverUrl = url.trim();
+      const cleanUrl = url.trim();
+      if (!cleanUrl) return;
+
+      if (type === "photo") cu.photoUrl = cleanUrl;
+      if (type === "cover") cu.coverUrl = cleanUrl;
 
       persistUser(cu);
     }
 
-    $("tab-login").addEventListener("click", () => switchTab(0));
-    $("tab-signup").addEventListener("click", () => switchTab(1));
-    $("go-login").addEventListener("click", () => switchTab(0));
-    $("go-signup").addEventListener("click", () => switchTab(1));
-    $("l-eye").addEventListener("click", () => togglePw("l-pass", "l-eye"));
-    $("s-eye").addEventListener("click", () => togglePw("s-pass", "s-eye"));
-    $("login-btn").addEventListener("click", doLogin);
-    $("signup-btn").addEventListener("click", doSignup);
-    $("logout-btn").addEventListener("click", doLogout);
-    $("photo-btn").addEventListener("click", () => $("photo-upload-input").click());
-    $("add-video-link").addEventListener("click", addVideoLink);
-    $("add-post-btn").addEventListener("click", addPost);
-    $("edit-profile-btn").addEventListener("click", openEditModal);
-    $("cancel-edit-btn").addEventListener("click", closeEditModal);
-    $("save-edit-btn").addEventListener("click", saveEditProfile);
-    $("set-photo-url-btn").addEventListener("click", () => setUrl("photo"));
-    $("set-cover-url-btn").addEventListener("click", () => setUrl("cover"));
+    const bind = (id, evt, fn) => {
+      const el = $(id);
+      if (el) el.addEventListener(evt, fn);
+    };
 
-    $("photo-upload-input").addEventListener("change", uploadPhoto);
+    bind("tab-login", "click", () => switchTab(0));
+    bind("tab-signup", "click", () => switchTab(1));
+    bind("go-login", "click", () => switchTab(0));
+    bind("go-signup", "click", () => switchTab(1));
+    bind("l-eye", "click", () => togglePw("l-pass", "l-eye"));
+    bind("s-eye", "click", () => togglePw("s-pass", "s-eye"));
+    bind("login-btn", "click", doLogin);
+    bind("signup-btn", "click", doSignup);
+    bind("logout-btn", "click", doLogout);
+    bind("photo-btn", "click", () => $("photo-upload-input")?.click());
+    bind("add-video-link", "click", addVideoLink);
+    bind("add-post-btn", "click", addPost);
+    bind("edit-profile-btn", "click", openEditModal);
+    bind("cancel-edit-btn", "click", closeEditModal);
+    bind("save-edit-btn", "click", saveEditProfile);
+    bind("set-photo-url-btn", "click", () => setUrl("photo"));
+    bind("set-cover-url-btn", "click", () => setUrl("cover"));
 
-    $("video-grid").addEventListener("click", (e) => {
+    bind("photo-upload-input", "change", uploadPhoto);
+
+    bind("video-grid", "click", (e) => {
       const btn = e.target.closest("button[data-action]");
       if (!btn) return;
       const index = Number(btn.dataset.index);
@@ -1160,9 +1167,9 @@
       if (action === "rename-video") renameVideo(index);
     });
 
-    $("posts-list").addEventListener("click", handlePostActions);
+    bind("posts-list", "click", handlePostActions);
 
-    $("theme-toggle").addEventListener("click", () => {
+    bind("theme-toggle", "click", () => {
       document.body.classList.toggle("light-mode");
     });
 
