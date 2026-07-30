@@ -213,10 +213,16 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 16px;
+      align-items: center;
     }
 
     .upload-group .btn {
       flex: 1 1 160px;
+    }
+
+    .upload-group .input-inline {
+      flex: 1 1 220px;
+      min-width: 0;
     }
 
     .profile-cover {
@@ -489,17 +495,16 @@
           <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Profile</h3>
           <p id="p-bio" style="color:#a1a1aa;font-size:13px;font-style:italic;margin-bottom:14px;">No bio added</p>
 
+          <!-- FIXED: put cover photo URL control next to Change Photo -->
           <div class="upload-group">
             <button type="button" class="btn btn-orange" id="photo-btn">Change Photo</button>
+            <button type="button" class="btn btn-orange" id="set-photo-url-btn">Set Photo URL</button>
+            <button type="button" class="btn btn-orange" id="set-cover-url-btn">Set Cover Photo URL</button>
             <input type="file" id="photo-upload-input" accept="image/*" class="hidden" />
           </div>
 
           <div class="upload-group">
-            <button type="button" class="btn btn-orange" id="set-photo-url-btn">Set Photo URL</button>
-          </div>
-
-          <div class="upload-group">
-            <input type="text" id="video-link" placeholder="Paste YouTube URL or direct video URL" />
+            <input type="text" id="video-link" class="input-inline" placeholder="Paste YouTube URL or direct video URL" />
             <button type="button" id="add-video-link" class="btn btn-gray">Add Video Link</button>
           </div>
 
@@ -1115,10 +1120,14 @@
 
     function setUrl(type) {
       if (!cu) return;
-      const url = prompt(`Enter ${type} URL:`, cu.photoUrl || "");
+
+      const current = type === "photo" ? cu.photoUrl : cu.coverUrl;
+      const url = prompt(`Enter ${type} URL:`, current || "");
       if (!url) return;
 
       if (type === "photo") cu.photoUrl = url.trim();
+      if (type === "cover") cu.coverUrl = url.trim();
+
       persistUser(cu);
     }
 
@@ -1138,6 +1147,7 @@
     $("cancel-edit-btn").addEventListener("click", closeEditModal);
     $("save-edit-btn").addEventListener("click", saveEditProfile);
     $("set-photo-url-btn").addEventListener("click", () => setUrl("photo"));
+    $("set-cover-url-btn").addEventListener("click", () => setUrl("cover"));
 
     $("photo-upload-input").addEventListener("change", uploadPhoto);
 
